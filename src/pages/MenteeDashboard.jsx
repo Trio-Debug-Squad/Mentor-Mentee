@@ -1,0 +1,81 @@
+import { useState, useEffect } from "react";
+import MenteeSidebar from "../components/mentee/MenteeSidebar";
+import MenteeHeader from "../components/mentee/MenteeHeader";
+import MenteeDashboardOverview from "../components/mentee/MenteeDashboardOverview";
+import TaskManagement from "../components/mentee/TaskManagement";
+import TaskSubmitModal from "../components/mentee/TaskSubmitModal";
+import PlaceholderSection from "../components/admin/PlaceholderSection";
+import { tasks as defaultTasks } from "../data/menteeData";
+
+export default function MenteeDashboard() {
+  const [activeNav, setActiveNav] = useState("Dashboard");
+  const [menteeTasks, setMenteeTasks] = useState(defaultTasks);
+  const [showSubmitModal, setShowSubmitModal] = useState(false);
+  const [selectedTask, setSelectedTask] = useState(null);
+
+  useEffect(() => {
+    const stored = JSON.parse(localStorage.getItem("mentorFlow_tasks"));
+    if (stored) {
+      const myTasks = stored.filter((t) => t.mentee === "Emily Davies");
+      if (myTasks.length > 0) setMenteeTasks(myTasks);
+    }
+  }, []);
+
+  const handleTaskClick = (task) => {
+    setSelectedTask(task);
+    setShowSubmitModal(true);
+  };
+
+  const handleSubmit = () => {
+    const stored = JSON.parse(localStorage.getItem("mentorFlow_tasks")) || [];
+    const updated = stored.map((t) =>
+      t.id === selectedTask.id ? { ...t, status: "Under Review" } : t,
+    );
+    localStorage.setItem("mentorFlow_tasks", JSON.stringify(updated));
+    setMenteeTasks(updated.filter((t) => t.mentee === "Emily Davies"));
+    setShowSubmitModal(false);
+    alert("Task submitted for review!");
+  };
+
+  // ── Render active section ─────────────────────────────
+  const renderSection = () => {
+    switch (activeNav) {
+      case "Dashboard":
+        return (
+          <MenteeDashboardOverview
+            tasks={menteeTasks}
+            onNavigate={setActiveNav}
+            onTaskClick={handleTaskClick}
+          />
+        );
+      case "Task Management":
+        return (
+          <TaskManagement tasks={menteeTasks} onTaskClick={handleTaskClick} />
+        );
+      default:
+        return <PlaceholderSection title={activeNav} />;
+    }
+  };
+
+  return (
+    <div className="flex min-h-screen bg-slate-50 font-sans overflow-x-hidden w-full">
+      <MenteeSidebar activeNav={activeNav} setActiveNav={setActiveNav} />
+
+      <main className="ml-64 flex-1 p-8 min-h-screen min-w-0">
+        <MenteeHeader
+          activeNav={activeNav}
+          onMessageMentor={() => setActiveNav("Messages & Meetings")}
+        />
+        {renderSection()}
+      </main>
+
+      {showSubmitModal && (
+        <TaskSubmitModal
+          task={selectedTask}
+          onClose={() => setShowSubmitModal(false)}
+          onSubmit={handleSubmit}
+        />
+      )}
+    </div>
+  );
+}
