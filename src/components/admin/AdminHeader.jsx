@@ -17,8 +17,8 @@ export default function AdminHeader({ onAddUser }) {
         className="flex items-center gap-2 text-white border-none rounded-xl
           px-3 py-2 text-[11px]
           md:px-4 md:py-2.5 md:text-[12px]
-          lg:px-[22px] lg:py-3 lg:text-[14px]
-          font-bold cursor-pointer transition-transform duration-150 hover:-translate-y-px flex-shrink-0"
+          lg:px-5.5 lg:py-3 lg:text-[14px]
+          font-bold cursor-pointer transition-transform duration-150 hover:-translate-y-px shrink-0"
         style={{
           background: "linear-gradient(135deg, #3b82f6, #60a5fa)",
           boxShadow: "0 4px 16px rgba(59,130,246,0.3)",
@@ -28,7 +28,7 @@ export default function AdminHeader({ onAddUser }) {
         <svg
           width="14"
           height="14"
-          className="md:w-4 md:h-4 lg:w-[18px] lg:h-[18px]"
+          className="md:w-4 md:h-4 lg:w-4.5 lg:h-4.5"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"

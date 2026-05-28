@@ -66,7 +66,7 @@ export default function SidebarNavItem({
       {/* Category header */}
       <button
         onClick={() => onExpand(category)}
-        className="flex items-center justify-between w-full px-[12px] md:px-[10px] lg:px-[14px] py-[10px] md:py-[9px] lg:py-[11px] border-none rounded-xl cursor-pointer text-[13px] md:text-[12px] lg:text-[14px] font-bold transition-all duration-200"
+        className="flex items-center justify-between w-full px-3 md:px-2.5 lg:px-3.5 py-2.5 md:py-2.25 lg:py-2.75 border-none rounded-xl cursor-pointer text-[13px] md:text-[12px] lg:text-[14px] font-bold transition-all duration-200"
         style={{
           background: isExpanded ? "#f8fafc" : "transparent",
           color: "#1e293b",

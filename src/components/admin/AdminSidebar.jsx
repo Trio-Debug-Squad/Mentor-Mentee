@@ -32,25 +32,25 @@ export default function AdminSidebar({
       {/* Mobile backdrop */}
       {mobileOpen && (
         <div
-          className="md:hidden fixed inset-0 bg-black/30 z-[90] backdrop-blur-sm"
+          className="md:hidden fixed inset-0 bg-black/30 z-90 backdrop-blur-sm"
           onClick={() => setMobileOpen(false)}
         />
       )}
 
       <aside
         className={[
-          "bg-white border-r border-[#f1f5f9] flex flex-col fixed top-0 left-0 bottom-0 z-[100] transition-all duration-300",
-          "w-[260px]",
+          "bg-white border-r border-[#f1f5f9] flex flex-col fixed top-0 left-0 bottom-0 z-100 transition-all duration-300",
+          "w-65",
           mobileOpen ? "translate-x-0" : "-translate-x-full",
-          "md:translate-x-0 md:w-[220px]",
-          "lg:w-[260px]",
+          "md:translate-x-0 md:w-55",
+          "lg:w-65",
         ].join(" ")}
         style={{ boxShadow: "2px 0 20px rgba(59,130,246,0.05)" }}
       >
         {/* ── Logo ── */}
         <div className="flex items-center gap-3 px-5 md:px-4 lg:px-6 pb-7 pt-7">
           <div
-            className="w-9 h-9 md:w-8 md:h-8 lg:w-10 lg:h-10 rounded-xl flex items-center justify-center text-white font-black text-[16px] lg:text-[18px] flex-shrink-0"
+            className="w-9 h-9 md:w-8 md:h-8 lg:w-10 lg:h-10 rounded-xl flex items-center justify-center text-white font-black text-[16px] lg:text-[18px] shrink-0"
             style={{ background: "linear-gradient(135deg, #1e293b, #334155)" }}
           >
             A
@@ -61,7 +61,7 @@ export default function AdminSidebar({
           {/* Close button — mobile only */}
           <button
             onClick={() => setMobileOpen(false)}
-            className="md:hidden ml-auto flex-shrink-0 w-7 h-7 flex items-center justify-center rounded-lg text-[#94a3b8] hover:text-[#1e293b] hover:bg-slate-100 transition-colors"
+            className="md:hidden ml-auto shrink-0 w-7 h-7 flex items-center justify-center rounded-lg text-[#94a3b8] hover:text-[#1e293b] hover:bg-slate-100 transition-colors"
           >
             <svg
               width="14"
@@ -90,7 +90,7 @@ export default function AdminSidebar({
                 handleNavClick("Dashboard");
                 setExpandedMenu(null);
               }}
-              className="flex items-center gap-3 w-full px-[12px] md:px-[10px] lg:px-[14px] py-[10px] md:py-[9px] lg:py-[11px] border-none rounded-xl cursor-pointer text-[13px] md:text-[12px] lg:text-[14px] font-bold transition-all duration-200"
+              className="flex items-center gap-3 w-full px-3 md:px-2.5 lg:px-3.5 py-2.5 md:py-2.25 lg:py-2.75 border-none rounded-xl cursor-pointer text-[13px] md:text-[12px] lg:text-[14px] font-bold transition-all duration-200"
               style={{
                 background:
                   activeNav === "Dashboard"
@@ -137,7 +137,7 @@ export default function AdminSidebar({
         </div>
 
         {/* ── User strip ── */}
-        <div className="mx-3 lg:mx-4 pt-[14px] border-t border-[#f1f5f9] flex items-center gap-3">
+        <div className="mx-3 lg:mx-4 pt-3.5 border-t border-[#f1f5f9] flex items-center gap-3">
           <Avatar initials="AD" color="#1e293b" size={36} />
           <div className="min-w-0">
             <div className="text-[13px] lg:text-[14px] font-bold text-[#1e293b] truncate">

@@ -58,7 +58,7 @@ export default function DashboardOverview({ projects, onAddProject }) {
 
           {/* Scrollable on mobile */}
           <div className="overflow-x-auto">
-            <table className="w-full border-collapse min-w-[480px]">
+            <table className="w-full border-collapse min-w-120">
               <thead>
                 <tr className="bg-slate-50">
                   {["Project Name", "Mentor", "Status", "Progress"].map((h) => (
@@ -112,7 +112,7 @@ export default function DashboardOverview({ projects, onAddProject }) {
             {recentActivities.map((act) => (
               <div key={act.id} className="flex gap-3 lg:gap-4 items-start">
                 <div
-                  className="w-7 h-7 md:w-8 md:h-8 lg:w-10 lg:h-10 rounded-full flex items-center justify-center text-xs md:text-sm lg:text-base font-black flex-shrink-0"
+                  className="w-7 h-7 md:w-8 md:h-8 lg:w-10 lg:h-10 rounded-full flex items-center justify-center text-xs md:text-sm lg:text-base font-black shrink-0"
                   style={{ background: act.bg, color: act.color }}
                 >
                   {act.icon}

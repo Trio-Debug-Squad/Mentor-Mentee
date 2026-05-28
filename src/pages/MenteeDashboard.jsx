@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
-import MenteeSidebar from "../components/mentee/MenteeSidebar";
+import MenteeSidebar, {
+  MenteeSidebarToggle,
+} from "../components/mentee/MenteeSidebar";
 import MenteeHeader from "../components/mentee/MenteeHeader";
 import MenteeDashboardOverview from "../components/mentee/MenteeDashboardOverview";
 import TaskManagement from "../components/mentee/TaskManagement";
@@ -12,6 +14,7 @@ export default function MenteeDashboard() {
   const [menteeTasks, setMenteeTasks] = useState(defaultTasks);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
     const stored = JSON.parse(localStorage.getItem("mentorFlow_tasks"));
@@ -37,7 +40,6 @@ export default function MenteeDashboard() {
     alert("Task submitted for review!");
   };
 
-  // ── Render active section ─────────────────────────────
   const renderSection = () => {
     switch (activeNav) {
       case "Dashboard":
@@ -59,9 +61,25 @@ export default function MenteeDashboard() {
 
   return (
     <div className="flex min-h-screen bg-slate-50 font-sans overflow-x-hidden w-full">
-      <MenteeSidebar activeNav={activeNav} setActiveNav={setActiveNav} />
+      <MenteeSidebar
+        activeNav={activeNav}
+        setActiveNav={setActiveNav}
+        mobileOpen={mobileOpen}
+        setMobileOpen={setMobileOpen}
+      />
 
-      <main className="ml-64 flex-1 p-8 min-h-screen min-w-0">
+      <main
+        className="flex-1 min-h-screen min-w-0
+        ml-0 md:ml-55 lg:ml-64
+        p-4 sm:p-6 lg:p-8
+        pt-16 md:pt-8"
+      >
+        {/* Hamburger — mobile only, hides when sidebar open */}
+        <MenteeSidebarToggle
+          onClick={() => setMobileOpen(true)}
+          mobileOpen={mobileOpen}
+        />
+
         <MenteeHeader
           activeNav={activeNav}
           onMessageMentor={() => setActiveNav("Messages & Meetings")}

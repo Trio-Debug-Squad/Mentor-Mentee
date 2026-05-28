@@ -124,7 +124,7 @@ export default function LoginRightPanel({
   return (
     <div className="bg-[#F7F4EF] flex flex-col justify-center items-center lg:items-start px-5 sm:px-10 lg:px-14 py-14">
       {/* Mobile logo */}
-      <div className="flex lg:hidden items-center gap-2.5 mb-10 w-full max-w-[360px]">
+      <div className="flex lg:hidden items-center gap-2.5 mb-10 w-full max-w-90">
         <div className="w-8 h-8 bg-[#E8B86D] rounded-[9px] flex items-center justify-center">
           <StarIcon size={14} />
         </div>
@@ -133,13 +133,13 @@ export default function LoginRightPanel({
         </span>
         <button
           onClick={handleHome}
-          className="ml-auto text-[12px] text-[#B09070] border border-[#E2DDD8] rounded-full px-[14px] py-[6px] cursor-pointer font-['DM_Sans',sans-serif] hover:border-[#C5BEB8] transition-colors duration-150"
+          className="ml-auto text-[12px] text-[#B09070] border border-[#E2DDD8] rounded-full px-3.5 py-1.5 cursor-pointer font-['DM_Sans',sans-serif] hover:border-[#C5BEB8] transition-colors duration-150"
         >
           ← Home
         </button>
       </div>
 
-      <div className="max-w-[360px] w-full">
+      <div className="max-w-90 w-full">
         {/* Header */}
         <div className="mb-9">
           <p className="text-[11px] font-medium tracking-[0.18em] text-[#B09070] uppercase mb-2.5">
@@ -154,10 +154,10 @@ export default function LoginRightPanel({
         <button
           type="button"
           onClick={onGoogleLogin}
-          className="w-full flex items-center gap-3 px-[18px] py-[13px] bg-white border border-[#E2DDD8] rounded-xl cursor-pointer text-[14px] text-[#1A1714] mb-4 transition-colors duration-150 font-['DM_Sans',sans-serif] hover:border-[#C5BEB8]"
+          className="w-full flex items-center gap-3 px-4.5 py-3.25 bg-white border border-[#E2DDD8] rounded-xl cursor-pointer text-[14px] text-[#1A1714] mb-4 transition-colors duration-150 font-['DM_Sans',sans-serif] hover:border-[#C5BEB8]"
         >
           <GoogleIcon />
-          <span className="flex-1 text-center mr-[18px]">
+          <span className="flex-1 text-center mr-4.5">
             Continue with Google
           </span>
         </button>
@@ -190,7 +190,7 @@ export default function LoginRightPanel({
           onSubmit={onSubmit}
         />
 
-        <p className="text-center mt-[22px] text-[13px] text-[#9C948C]">
+        <p className="text-center mt-5.5 text-[13px] text-[#9C948C]">
           New here?{" "}
           <a
             href="#"

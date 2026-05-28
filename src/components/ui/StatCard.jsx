@@ -6,9 +6,9 @@ const badgeStyles = {
 export default function StatCard({ icon, label, value, badge, badgeColor }) {
   return (
     <div
-      className="bg-white rounded-[14px] md:rounded-[16px] lg:rounded-[18px]
+      className="bg-white rounded-[14px] md:rounded-2xl lg:rounded-[18px]
         px-4 py-4 md:px-5 md:py-5 lg:px-7 lg:py-6
-        flex-1 min-w-[140px] md:min-w-[160px] lg:min-w-[180px]
+        flex-1 min-w-35 md:min-w-40 lg:min-w-45
         border border-[#f1f5f9] relative overflow-hidden"
       style={{ boxShadow: "0 2px 16px rgba(59,130,246,0.06)" }}
     >
@@ -20,7 +20,7 @@ export default function StatCard({ icon, label, value, badge, badgeColor }) {
 
         {/* Badge */}
         <span
-          className={`px-2 py-[2px] md:px-2.5 md:py-[3px] rounded-full text-[10px] md:text-[11px] lg:text-[12px] font-semibold ${badgeStyles[badgeColor] || badgeStyles.blue}`}
+          className={`px-2 py-0.5 md:px-2.5 md:py-0.75 rounded-full text-[10px] md:text-[11px] lg:text-[12px] font-semibold ${badgeStyles[badgeColor] || badgeStyles.blue}`}
         >
           {badge}
         </span>

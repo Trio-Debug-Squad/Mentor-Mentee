@@ -100,8 +100,8 @@ export default function LoginLeftPanel({ onNavigate, onBack }) {
   return (
     <div className="hidden lg:flex bg-[#1A1714] relative overflow-hidden flex-col justify-between p-14">
       {/* Decorative circles */}
-      <div className="absolute top-[-120px] right-[-80px] w-[380px] h-[380px] rounded-full border border-[rgba(247,244,239,0.07)] pointer-events-none" />
-      <div className="absolute bottom-[60px] left-[-100px] w-[300px] h-[300px] rounded-full border border-[rgba(247,244,239,0.05)] pointer-events-none" />
+      <div className="absolute -top-30 -right-20 w-95 h-95 rounded-full border border-[rgba(247,244,239,0.07)] pointer-events-none" />
+      <div className="absolute bottom-15 -left-25 w-75 h-75 rounded-full border border-[rgba(247,244,239,0.05)] pointer-events-none" />
 
       {/* Logo */}
       <div className="flex items-center gap-2.5 relative z-10">
@@ -113,7 +113,7 @@ export default function LoginLeftPanel({ onNavigate, onBack }) {
         </span>
         <button
           onClick={handleHome}
-          className="ml-auto bg-[rgba(247,244,239,0.08)] border border-[rgba(247,244,239,0.12)] text-[rgba(247,244,239,0.6)] rounded-full px-[14px] py-[6px] text-[12px] cursor-pointer font-['DM_Sans',sans-serif] hover:bg-[rgba(247,244,239,0.12)] transition-colors duration-150"
+          className="ml-auto bg-[rgba(247,244,239,0.08)] border border-[rgba(247,244,239,0.12)] text-[rgba(247,244,239,0.6)] rounded-full px-3.5 py-1.5 text-[12px] cursor-pointer font-['DM_Sans',sans-serif] hover:bg-[rgba(247,244,239,0.12)] transition-colors duration-150"
         >
           ← Home
         </button>

@@ -53,7 +53,7 @@ export default function LoginSuccessScreen({
 
   return (
     <div className="min-h-screen bg-[#F7F4EF] font-['DM_Sans',sans-serif] flex items-center justify-center flex-col gap-5 px-4">
-      <div className="bg-white border border-[#E2DDD8] rounded-3xl p-10 sm:p-12 max-w-[360px] w-full text-center">
+      <div className="bg-white border border-[#E2DDD8] rounded-3xl p-10 sm:p-12 max-w-90 w-full text-center">
         <div className="text-[40px] mb-4">✓</div>
 
         <p className="text-[11px] tracking-[0.18em] text-[#B09070] uppercase mb-2">
@@ -70,14 +70,14 @@ export default function LoginSuccessScreen({
 
         <button
           onClick={onSignOut}
-          className="w-full py-[13px] bg-[#1A1714] text-[#F7F4EF] border-none rounded-xl text-[14px] font-medium cursor-pointer font-['DM_Sans',sans-serif] hover:bg-[#2E2A26] transition-colors duration-150"
+          className="w-full py-3.25 bg-[#1A1714] text-[#F7F4EF] border-none rounded-xl text-[14px] font-medium cursor-pointer font-['DM_Sans',sans-serif] hover:bg-[#2E2A26] transition-colors duration-150"
         >
           Sign out
         </button>
 
         <button
           onClick={handleHome}
-          className="mt-2.5 w-full py-[13px] bg-white text-[#1A1714] border border-[#E2DDD8] rounded-xl text-[14px] font-medium cursor-pointer font-['DM_Sans',sans-serif] hover:border-[#C5BEB8] hover:bg-[#FDFCFB] transition-all duration-150"
+          className="mt-2.5 w-full py-3.25 bg-white text-[#1A1714] border border-[#E2DDD8] rounded-xl text-[14px] font-medium cursor-pointer font-['DM_Sans',sans-serif] hover:border-[#C5BEB8] hover:bg-[#FDFCFB] transition-all duration-150"
         >
           ← Back to home
         </button>

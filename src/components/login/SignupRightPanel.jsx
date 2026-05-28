@@ -44,7 +44,7 @@ export default function SignupRightPanel({
   return (
     <div className="bg-[#F7F4EF] flex flex-col justify-center items-center lg:items-start px-5 sm:px-10 lg:px-14 py-14">
       {/* Mobile logo */}
-      <div className="flex lg:hidden items-center gap-2.5 mb-10 w-full max-w-[360px]">
+      <div className="flex lg:hidden items-center gap-2.5 mb-10 w-full max-w-90">
         <div className="w-8 h-8 bg-[#E8B86D] rounded-[9px] flex items-center justify-center">
           <StarIcon size={14} />
         </div>
@@ -53,13 +53,13 @@ export default function SignupRightPanel({
         </span>
         <button
           onClick={handleHome}
-          className="ml-auto text-[12px] text-[#B09070] border border-[#E2DDD8] rounded-full px-[14px] py-[6px] cursor-pointer font-['DM_Sans',sans-serif] hover:border-[#C5BEB8] transition-colors duration-150"
+          className="ml-auto text-[12px] text-[#B09070] border border-[#E2DDD8] rounded-full px-3.5 py-1.5 cursor-pointer font-['DM_Sans',sans-serif] hover:border-[#C5BEB8] transition-colors duration-150"
         >
           ← Home
         </button>
       </div>
 
-      <div className="max-w-[360px] w-full">
+      <div className="max-w-90 w-full">
         {/* Header */}
         <div className="mb-9">
           <p className="text-[11px] font-medium tracking-[0.18em] text-[#B09070] uppercase mb-2.5">
@@ -89,12 +89,12 @@ export default function SignupRightPanel({
         {/* Back to home */}
         <button
           onClick={handleHome}
-          className="w-full py-[13px] bg-white text-[#1A1714] border border-[#E2DDD8] rounded-xl text-[14px] font-medium cursor-pointer font-['DM_Sans',sans-serif] hover:border-[#C5BEB8] hover:bg-[#FDFCFB] transition-all duration-150"
+          className="w-full py-3.25 bg-white text-[#1A1714] border border-[#E2DDD8] rounded-xl text-[14px] font-medium cursor-pointer font-['DM_Sans',sans-serif] hover:border-[#C5BEB8] hover:bg-[#FDFCFB] transition-all duration-150"
         >
           ← Back to home
         </button>
 
-        <p className="text-center mt-[22px] text-[13px] text-[#9C948C]">
+        <p className="text-center mt-5.5 text-[13px] text-[#9C948C]">
           Already have an account?{" "}
           <a
             href="#"

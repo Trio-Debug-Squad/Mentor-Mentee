@@ -18,7 +18,7 @@ export default function SignupForm({
     <form onSubmit={onSubmit} className="mt-1">
       {/* Error */}
       {error && (
-        <div className="text-[12px] text-[#B91C1C] px-[14px] py-[10px] bg-[#FEF2F2] border border-[#FECACA] rounded-xl mb-3.5 leading-[1.5]">
+        <div className="text-[12px] text-[#B91C1C] px-3.5 py-2.5 bg-[#FEF2F2] border border-[#FECACA] rounded-xl mb-3.5 leading-normal">
           {error}
         </div>
       )}
@@ -86,7 +86,7 @@ export default function SignupForm({
       <button
         type="submit"
         disabled={loading}
-        className="w-full py-[14px] bg-[#1A1714] text-[#F7F4EF] border-none rounded-xl text-[14px] font-medium cursor-pointer font-['DM_Sans',sans-serif] tracking-[0.01em] mt-4 transition-colors duration-150 hover:bg-[#2E2A26] disabled:opacity-70 disabled:cursor-not-allowed"
+        className="w-full py-3.5 bg-[#1A1714] text-[#F7F4EF] border-none rounded-xl text-[14px] font-medium cursor-pointer font-['DM_Sans',sans-serif] tracking-[0.01em] mt-4 transition-colors duration-150 hover:bg-[#2E2A26] disabled:opacity-70 disabled:cursor-not-allowed"
       >
         {loading ? "Creating account…" : "Create account"}
       </button>

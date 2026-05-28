@@ -66,7 +66,7 @@ export default function AdminDashboard() {
 
       <main
         className="flex-1 min-h-screen min-w-0
-        ml-0 md:ml-[220px] lg:ml-[260px]
+        ml-0 md:ml-55 lg:ml-65
         p-4 sm:p-6 lg:p-8
         pt-16 md:pt-8"
       >

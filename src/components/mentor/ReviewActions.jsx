@@ -22,24 +22,29 @@ export default function ReviewActions() {
 
   return (
     <div
-      className="ml-8 bg-white rounded-2xl p-8 border border-slate-100 mb-8"
+      className="ml-0 md:ml-4 lg:ml-8 bg-white rounded-2xl p-4 md:p-6 lg:p-8 border border-slate-100 mb-5 md:mb-6 lg:mb-8"
       style={{ boxShadow: "0 2px 16px rgba(99,102,241,0.07)" }}
     >
-      <h2 className="m-0 mb-6 text-xl font-black text-slate-800">
+      <h2 className="m-0 mb-4 md:mb-5 lg:mb-6 text-base md:text-lg lg:text-xl font-black text-slate-800">
         Review Actions
       </h2>
-      <div className="flex gap-5">
+
+      <div className="flex flex-col sm:flex-row gap-3 md:gap-4 lg:gap-5">
         {actions.map((a) => (
           <div
             key={a.title}
-            className="flex-1 border border-slate-200 rounded-2xl p-8 text-center cursor-pointer transition-colors"
+            className="flex-1 border border-slate-200 rounded-xl md:rounded-2xl
+              p-5 md:p-6 lg:p-8
+              text-center cursor-pointer transition-colors"
             onMouseOver={(e) =>
               (e.currentTarget.style.borderColor = a.hoverBorder)
             }
             onMouseOut={(e) => (e.currentTarget.style.borderColor = "#e2e8f0")}
           >
+            {/* Icon */}
             <div
-              className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl font-black"
+              className="w-10 h-10 md:w-12 md:h-12 lg:w-16 lg:h-16 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4
+                text-xl md:text-2xl lg:text-3xl font-black"
               style={{
                 background: a.iconBg,
                 color: a.iconColor,
@@ -48,10 +53,14 @@ export default function ReviewActions() {
             >
               {a.icon}
             </div>
-            <h3 className="m-0 mb-2 text-lg font-bold text-slate-800">
+
+            {/* Title */}
+            <h3 className="m-0 mb-1.5 md:mb-2 text-sm md:text-base lg:text-lg font-bold text-slate-800">
               {a.title}
             </h3>
-            <p className="m-0 text-xs text-slate-500 leading-relaxed">
+
+            {/* Description */}
+            <p className="m-0 text-[11px] md:text-xs lg:text-sm text-slate-500 leading-relaxed">
               {a.desc}
             </p>
           </div>

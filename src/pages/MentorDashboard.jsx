@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
-import MentorSidebar from "../components/mentor/MentorSidebar";
+import MentorSidebar, {
+  MentorSidebarToggle,
+} from "../components/mentor/MentorSidebar";
 import MentorHeader from "../components/mentor/MentorHeader";
 import MentorOverview from "../components/mentor/MentorOverview";
 import CreateTasksSection from "../components/mentor/CreateTasksSection";
@@ -26,6 +28,7 @@ export default function MentorDashboard() {
   const [showNewUserModal, setShowNewUserModal] = useState(false);
   const [projects, setProjects] = useState([]);
   const [tasks, setTasks] = useState([]);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
     const storedProjects =
@@ -57,7 +60,6 @@ export default function MentorDashboard() {
     alert("Task created and assigned to " + mentee);
   };
 
-  // ── Render active section ─────────────────────────────
   const renderSection = () => {
     if (overviewNavItems.includes(activeNav)) {
       return <MentorOverview projects={projects} />;
@@ -71,7 +73,7 @@ export default function MentorDashboard() {
         return <ReviewActions />;
       default:
         return (
-          <div className="ml-8">
+          <div className="md:ml-4 lg:ml-8">
             <PlaceholderSection title={activeNav} />
           </div>
         );
@@ -85,9 +87,22 @@ export default function MentorDashboard() {
         setActiveNav={setActiveNav}
         expandedMenu={expandedMenu}
         setExpandedMenu={setExpandedMenu}
+        mobileOpen={mobileOpen}
+        setMobileOpen={setMobileOpen}
       />
 
-      <main className="ml-64 flex-1 py-8 pr-8 min-h-screen min-w-0">
+      <main
+        className="flex-1 min-h-screen min-w-0
+        ml-0 md:ml-55 lg:ml-64
+        py-4 px-4 sm:py-6 sm:px-6 lg:py-8 lg:pr-8 lg:pl-0
+        pt-16 md:pt-8"
+      >
+        {/* Hamburger — mobile only, hides when sidebar open */}
+        <MentorSidebarToggle
+          onClick={() => setMobileOpen(true)}
+          mobileOpen={mobileOpen}
+        />
+
         <MentorHeader onNewUser={() => setShowNewUserModal(true)} />
         {renderSection()}
       </main>

@@ -1,12 +1,19 @@
 export default function MentorHeader({ onNewUser }) {
   return (
-    <div className="flex justify-between items-start mb-7 pl-8">
-      <h1 className="text-2xl font-black text-slate-800 tracking-tight m-0">
+    <div className="flex justify-between items-start mb-5 md:mb-6 lg:mb-7 pl-0 md:pl-4 lg:pl-8 gap-3">
+      {/* Title */}
+      <h1 className="text-[18px] md:text-xl lg:text-2xl font-black text-slate-800 tracking-tight m-0">
         MENTOR DASHBOARD
       </h1>
+
+      {/* Button */}
       <button
         onClick={onNewUser}
-        className="flex items-center gap-2 text-white border-0 rounded-xl px-5 py-3 font-bold text-sm cursor-pointer transition-transform duration-150 hover:-translate-y-px"
+        className="flex items-center gap-1.5 md:gap-2 text-white border-0 rounded-xl
+          px-3 py-2 text-[11px]
+          md:px-4 md:py-2.5 md:text-xs
+          lg:px-5 lg:py-3 lg:text-sm
+          font-bold cursor-pointer transition-transform duration-150 hover:-translate-y-px shrink-0"
         style={{
           background: "linear-gradient(135deg, #6366f1, #818cf8)",
           boxShadow: "0 4px 16px rgba(99,102,241,0.35)",
@@ -14,8 +21,9 @@ export default function MentorHeader({ onNewUser }) {
         }}
       >
         <svg
-          width="18"
-          height="18"
+          width="14"
+          height="14"
+          className="md:w-4 md:h-4 lg:w-4.5 lg:h-4.5"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -26,7 +34,8 @@ export default function MentorHeader({ onNewUser }) {
           <line x1="19" y1="8" x2="19" y2="14" />
           <line x1="22" y1="11" x2="16" y2="11" />
         </svg>
-        NEW USER
+        <span className="hidden sm:inline">NEW USER</span>
+        <span className="sm:hidden">ADD</span>
       </button>
     </div>
   );

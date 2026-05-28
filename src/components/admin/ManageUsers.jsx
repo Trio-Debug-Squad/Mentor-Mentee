@@ -30,7 +30,7 @@ export default function ManageUsers() {
 
       {/* Scrollable table on mobile */}
       <div className="overflow-x-auto">
-        <table className="w-full border-collapse min-w-[520px]">
+        <table className="w-full border-collapse min-w-130">
           <thead>
             <tr className="bg-slate-50">
               {["User Name", "Role", "Joined Date", "Status", "Actions"].map(

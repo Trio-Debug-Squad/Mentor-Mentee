@@ -12,9 +12,9 @@ export default function MenteeDashboardOverview({
     <div>
       <MenteeQuickStats />
 
-      <div className="flex gap-6 items-start">
-        {/* Left column */}
-        <div className="flex flex-col gap-6" style={{ flex: 2 }}>
+      <div className="flex flex-col lg:flex-row gap-4 md:gap-5 lg:gap-6 items-start">
+        {/* Left column — stacks on mobile/tablet, side by side on desktop */}
+        <div className="flex flex-col gap-4 md:gap-5 lg:gap-6 w-full lg:flex-2">
           <AssignedProjectsCard
             onViewAll={() => onNavigate("Assigned Projects")}
           />
@@ -25,8 +25,8 @@ export default function MenteeDashboardOverview({
           />
         </div>
 
-        {/* Right column */}
-        <div className="flex flex-col gap-6" style={{ flex: 1 }}>
+        {/* Right column — stacks on mobile/tablet, side by side on desktop */}
+        <div className="flex flex-col gap-4 md:gap-5 lg:gap-6 w-full lg:flex-1">
           <RecentFeedbackCard />
           <NotificationsCard />
         </div>
