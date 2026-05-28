@@ -71,6 +71,13 @@ export default function MenteeSidebar({
   mobileOpen,
   setMobileOpen,
 }) {
+  const currentUser = JSON.parse(localStorage.getItem("mentorFlow_currentUser")) || {
+    name: "Emily Davies",
+    role: "MENTEE",
+    avatar: "ED",
+    color: "#f472b6"
+  };
+
   const [expandedMenu, setExpandedMenu] = useState(null);
 
   const handleNavClick = (item) => {
@@ -250,12 +257,14 @@ export default function MenteeSidebar({
 
         {/* Bottom user */}
         <div className="mx-3 lg:mx-4 pt-3.5 border-t border-slate-100 flex items-center gap-3">
-          <Avatar initials="ED" color="#f472b6" size={36} />
+          <Avatar initials={currentUser.avatar} color={currentUser.color} size={36} />
           <div className="min-w-0">
             <div className="text-[13px] lg:text-sm font-bold text-slate-800 truncate">
-              Emily Davies
+              {currentUser.name}
             </div>
-            <div className="text-[11px] lg:text-xs text-slate-400">Mentee</div>
+            <div className="text-[11px] lg:text-xs text-slate-400">
+              {currentUser.role === "MENTEE" ? "Mentee" : "Mentor"}
+            </div>
           </div>
         </div>
       </aside>

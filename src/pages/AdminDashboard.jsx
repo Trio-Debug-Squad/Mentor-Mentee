@@ -3,38 +3,44 @@ import AdminSidebar, { SidebarToggle } from "../components/admin/AdminSidebar";
 import AdminHeader from "../components/admin/AdminHeader";
 import DashboardOverview from "../components/admin/DashboardOverview";
 import ManageUsers from "../components/admin/ManageUsers";
-import AssignMentors from "../components/admin/AssignMentors";
+import ProjectsList from "../components/admin/ProjectsList";
+import ProjectDetail from "../components/admin/ProjectDetail";
+import InvitationsList from "../components/admin/InvitationsList";
+import ActivityLogs from "../components/admin/ActivityLogs";
+import AdminSettings from "../components/admin/AdminSettings";
 import PlaceholderSection from "../components/admin/PlaceholderSection";
 import CreateUserModal from "../components/admin/CreateUserModal";
-import { mockProjects } from "../data/adminData";
+import { db } from "../data/db";
 
 export default function AdminDashboard() {
   const [activeNav, setActiveNav] = useState("Dashboard");
   const [projects, setProjects] = useState([]);
+  const [logs, setLogs] = useState([]);
   const [showCreateUser, setShowCreateUser] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [currentProjectId, setCurrentProjectId] = useState(null);
+
+  const refreshData = () => {
+    setProjects(db.projects.getAll());
+    setLogs(db.logs.getAll());
+  };
 
   useEffect(() => {
-    const stored = JSON.parse(localStorage.getItem("mentorFlow_projects"));
-    if (stored?.length > 0) {
-      setProjects(stored);
-    } else {
-      localStorage.setItem("mentorFlow_projects", JSON.stringify(mockProjects));
-      setProjects(mockProjects);
-    }
+    refreshData();
   }, []);
 
   const handleAddProject = (name) => {
-    const newProject = {
-      id: Date.now(),
-      name,
-      status: "Active",
-      mentor: "Unassigned",
-      progress: 0,
-    };
-    const updated = [...projects, newProject];
-    setProjects(updated);
-    localStorage.setItem("mentorFlow_projects", JSON.stringify(updated));
+    db.projects.create(name);
+    refreshData();
+  };
+
+  const handleUserCreated = () => {
+    refreshData();
+  };
+
+  const handleActiveNavChange = (name) => {
+    setActiveNav(name);
+    setCurrentProjectId(null);
   };
 
   const renderSection = () => {
@@ -43,13 +49,39 @@ export default function AdminDashboard() {
         return (
           <DashboardOverview
             projects={projects}
+            logs={logs}
             onAddProject={handleAddProject}
           />
         );
-      case "Manage Users":
-        return <ManageUsers />;
-      case "Assign Mentors":
-        return <AssignMentors projects={projects} />;
+      case "Projects":
+        if (currentProjectId) {
+          return (
+            <ProjectDetail
+              projectId={currentProjectId}
+              onBack={() => setCurrentProjectId(null)}
+              onRefresh={refreshData}
+            />
+          );
+        }
+        return (
+          <ProjectsList
+            onViewProject={(id) => setCurrentProjectId(id)}
+            onRefresh={refreshData}
+          />
+        );
+      case "Members":
+        return (
+          <ManageUsers
+            key={Date.now()}
+            onUserDeleted={handleUserCreated}
+          />
+        );
+      case "Invitations":
+        return <InvitationsList />;
+      case "Activity":
+        return <ActivityLogs />;
+      case "Settings":
+        return <AdminSettings />;
       default:
         return <PlaceholderSection title={activeNav} />;
     }
@@ -59,7 +91,7 @@ export default function AdminDashboard() {
     <div className="flex min-h-screen bg-slate-50 font-sans overflow-x-hidden w-full">
       <AdminSidebar
         activeNav={activeNav}
-        setActiveNav={setActiveNav}
+        setActiveNav={handleActiveNavChange}
         mobileOpen={mobileOpen}
         setMobileOpen={setMobileOpen}
       />
@@ -70,18 +102,22 @@ export default function AdminDashboard() {
         p-4 sm:p-6 lg:p-8
         pt-16 md:pt-8"
       >
-        {/* Pass mobileOpen so it hides when sidebar is open */}
         <SidebarToggle
           onClick={() => setMobileOpen(true)}
           mobileOpen={mobileOpen}
         />
 
         <AdminHeader onAddUser={() => setShowCreateUser(true)} />
-        {renderSection()}
+        <div className="mt-6 md:mt-4">
+          {renderSection()}
+        </div>
       </main>
 
       {showCreateUser && (
-        <CreateUserModal onClose={() => setShowCreateUser(false)} />
+        <CreateUserModal
+          onClose={() => setShowCreateUser(false)}
+          onUserCreated={handleUserCreated}
+        />
       )}
     </div>
   );

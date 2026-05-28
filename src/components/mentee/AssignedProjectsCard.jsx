@@ -1,8 +1,19 @@
 import Avatar from "../ui/Avatar";
 import ProgressBar from "../ui/ProgressBar";
-import { assignedProjects } from "../../data/menteeData";
+import { db } from "../../data/db";
 
 export default function AssignedProjectsCard({ onViewAll }) {
+  const currentUser = JSON.parse(localStorage.getItem("mentorFlow_currentUser")) || {
+    id: "1",
+    name: "Emily Davies",
+    role: "MENTEE"
+  };
+
+  // Fetch real assigned projects for this Mentee from the relational DB
+  const myProjects = db.projects.getAll().filter(
+    (p) => p.mentees && p.mentees.some((m) => m.id === currentUser.id)
+  );
+
   return (
     <div
       className="bg-white rounded-2xl p-4 md:p-5 lg:p-7 border border-slate-100"
@@ -23,49 +34,51 @@ export default function AssignedProjectsCard({ onViewAll }) {
       </div>
 
       <div className="flex flex-col gap-3 md:gap-4">
-        {assignedProjects.map((p) => (
-          <div
-            key={p.id}
-            className="flex flex-col sm:flex-row sm:items-center gap-3 md:gap-4 lg:gap-5
-              p-3 md:p-4 border border-slate-100 rounded-xl md:rounded-2xl bg-slate-50"
-          >
-            {/* Name + Mentor */}
-            <div className="flex-1 min-w-0">
-              <h3 className="m-0 mb-1 md:mb-1.5 text-xs md:text-sm lg:text-base font-bold text-slate-800 truncate">
-                {p.name}
-              </h3>
-              <div className="flex items-center gap-1.5 md:gap-2 text-[11px] md:text-xs text-slate-500">
-                <Avatar initials={p.avatar} color={p.color} size={18} />
-                Mentor: <strong className="text-slate-600">{p.mentor}</strong>
-              </div>
-            </div>
-
-            {/* Progress */}
-            <div className="w-full sm:w-28 md:w-32 lg:w-36">
-              <div className="text-[10px] md:text-xs text-slate-500 mb-1 md:mb-1.5 font-semibold">
-                Progress
-              </div>
-              <ProgressBar value={p.progress} />
-            </div>
-
-            {/* Deadline */}
-            <div className="w-full sm:w-28 md:w-32 lg:w-36 sm:text-right">
-              <div className="text-[10px] md:text-xs text-slate-500 mb-0.5 md:mb-1 font-semibold">
-                Next Deadline
-              </div>
-              <div
-                className="text-[11px] md:text-xs lg:text-sm font-bold"
-                style={{
-                  color: p.nextDeadline.includes("Tomorrow")
-                    ? "#ef4444"
-                    : "#1e293b",
-                }}
-              >
-                {p.nextDeadline}
-              </div>
-            </div>
+        {myProjects.length === 0 ? (
+          <div className="text-center py-6 text-slate-400 bg-slate-50 border border-slate-100 rounded-xl">
+            <span className="text-xs font-semibold">No projects assigned by Admin yet.</span>
           </div>
-        ))}
+        ) : (
+          myProjects.map((p) => {
+            const mentor = p.mentor || { name: "Unassigned", avatar: "UA", color: "#64748b" };
+            return (
+              <div
+                key={p.id}
+                className="flex flex-col sm:flex-row sm:items-center gap-3 md:gap-4 lg:gap-5
+                  p-3 md:p-4 border border-slate-100 rounded-xl md:rounded-2xl bg-slate-50"
+              >
+                {/* Name + Mentor */}
+                <div className="flex-1 min-w-0">
+                  <h3 className="m-0 mb-1 md:mb-1.5 text-xs md:text-sm lg:text-base font-bold text-slate-800 truncate">
+                    {p.name}
+                  </h3>
+                  <div className="flex items-center gap-1.5 md:gap-2 text-[11px] md:text-xs text-slate-500 font-semibold">
+                    <Avatar initials={mentor.avatar || mentor.name.substring(0, 2).toUpperCase()} color={mentor.color} size={18} />
+                    Mentor: <strong className="text-slate-600">{mentor.name}</strong>
+                  </div>
+                </div>
+
+                {/* Progress */}
+                <div className="w-full sm:w-28 md:w-32 lg:w-36">
+                  <div className="text-[10px] md:text-xs text-slate-500 mb-1 md:mb-1.5 font-semibold">
+                    Progress
+                  </div>
+                  <ProgressBar value={p.progress} />
+                </div>
+
+                {/* Deadline */}
+                <div className="w-full sm:w-28 md:w-32 lg:w-36 sm:text-right">
+                  <div className="text-[10px] md:text-xs text-slate-500 mb-0.5 md:mb-1 font-semibold">
+                    Next Deadline
+                  </div>
+                  <div className="text-[11px] md:text-xs lg:text-sm font-bold text-slate-800">
+                    Next week, 5:00 PM
+                  </div>
+                </div>
+              </div>
+            );
+          })
+        )}
       </div>
     </div>
   );

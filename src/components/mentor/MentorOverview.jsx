@@ -13,7 +13,34 @@ export default function MentorOverview({ projects }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [completedActions, setCompletedActions] = useState([]);
 
-  const filteredMentees = mentees.filter(
+  // Extract real assigned mentees from the projects prop!
+  const dbMentees = [];
+  const addedMenteeIds = new Set();
+
+  projects.forEach((p) => {
+    if (p.mentees) {
+      p.mentees.forEach((m) => {
+        if (!addedMenteeIds.has(m.id)) {
+          addedMenteeIds.add(m.id);
+          dbMentees.push({
+            id: m.id,
+            name: m.name,
+            project: p.name,
+            lastMeeting: "No meetings logged",
+            progress: p.progress,
+            status: p.progress === 100 ? "Completed" : "On Track",
+            avatar: m.avatar || m.name.substring(0, 2).toUpperCase(),
+            color: m.color || "#6366f1",
+          });
+        }
+      });
+    }
+  });
+
+  // Fall back to static mentees only if no active database assignments are found
+  const activeMenteesList = dbMentees.length > 0 ? dbMentees : mentees;
+
+  const filteredMentees = activeMenteesList.filter(
     (m) =>
       m.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       m.project.toLowerCase().includes(searchQuery.toLowerCase()),

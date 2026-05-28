@@ -1,7 +1,19 @@
+import { useState } from "react";
+
 export default function TaskSubmitModal({ task, onClose, onSubmit }) {
+  const [notes, setNotes] = useState("");
+
   if (!task) return null;
 
-  const isRevision = task.status === "Revision Needed";
+  const isRevision = task.status === "REJECTED" || task.status === "Revision Needed";
+  const latestFeedback = task.feedbacks && task.feedbacks.length > 0
+    ? task.feedbacks[task.feedbacks.length - 1].comment
+    : "Good start, but we need to rethink the navigation bar. Please revise the layout.";
+
+  const handleSubmitClick = () => {
+    onSubmit(notes || "Submitted deliverables.");
+    setNotes("");
+  };
 
   return (
     <div
@@ -31,8 +43,7 @@ export default function TaskSubmitModal({ task, onClose, onSubmit }) {
               Mentor Feedback:
             </div>
             <div className="text-[11px] md:text-xs text-red-900 leading-relaxed">
-              "Good start, but we need to rethink the navigation bar. Please
-              revise the layout before final submission."
+              "{latestFeedback}"
             </div>
           </div>
         )}
@@ -45,6 +56,8 @@ export default function TaskSubmitModal({ task, onClose, onSubmit }) {
             </label>
             <textarea
               placeholder="Describe what you've done..."
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
               className="w-full px-3 py-3 md:px-3.5 md:py-3.5 rounded-xl border border-slate-200 text-xs md:text-sm outline-none resize-none focus:border-indigo-400 transition-colors"
               style={{
                 minHeight: 80,
@@ -89,7 +102,7 @@ export default function TaskSubmitModal({ task, onClose, onSubmit }) {
             Cancel
           </button>
           <button
-            onClick={onSubmit}
+            onClick={handleSubmitClick}
             className="text-white border-0 rounded-xl font-bold text-xs md:text-sm cursor-pointer py-3 md:py-3.5"
             style={{
               flex: 2,

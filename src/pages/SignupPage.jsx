@@ -295,6 +295,8 @@ import { useNavigate } from "react-router-dom";
 import LoginLeftPanel from "../components/login/LoginLeftPanel";
 import SignupRightPanel from "../components/login/SignupRightPanel";
 
+import { db } from "../data/db";
+
 export default function SignupPage({ onNavigate, onBack }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -302,6 +304,8 @@ export default function SignupPage({ onNavigate, onBack }) {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -314,13 +318,30 @@ export default function SignupPage({ onNavigate, onBack }) {
       setError("Password must be at least 8 characters.");
       return;
     }
+    
+    // Check if email already exists in DB
+    const existing = db.users.getByEmail(email);
+    if (existing) {
+      setError("An account with this email address already exists.");
+      return;
+    }
+
     setLoading(true);
-    setTimeout(() => {
+    try {
+      const newUser = db.users.create({
+        name,
+        email,
+        role: "MENTEE"
+      });
+
+      localStorage.setItem("mentorFlow_currentUser", JSON.stringify(newUser));
+      alert(`Welcome, ${name}! Your Mentee account has been successfully created. Logging you in...`);
+      navigate("/mentee-dashboard");
+    } catch (err) {
+      setError("Error signing up. Please try again.");
+    } finally {
       setLoading(false);
-      setError(
-        "Sign up is not available in demo mode. Please use the login page with a demo account.",
-      );
-    }, 600);
+    }
   };
 
   return (

@@ -52,6 +52,10 @@ import AdminDashboard from "./pages/AdminDashboard";
 import MenteeDashboard from "./pages/MenteeDashboard";
 import MentorDashboard from "./pages/MentorDashboard";
 import SignupPage from "./pages/SignupPage";
+import { initDatabase } from "./data/db";
+
+// Initialize local relational database
+initDatabase();
 
 export default function App() {
   return (

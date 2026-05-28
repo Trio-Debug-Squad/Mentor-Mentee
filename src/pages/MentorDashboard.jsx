@@ -10,17 +10,9 @@ import NewUserModal from "../components/mentor/NewUserModal";
 import PlaceholderSection from "../components/admin/PlaceholderSection";
 import { overviewNavItems } from "../data/mentorData";
 
-const DEFAULT_TASKS = [
-  {
-    id: 1,
-    title: "Create Wireframes",
-    status: "Revision Needed",
-    priority: "High",
-    deadline: "Today, 11:59 PM",
-    assigner: "Sarah Connor",
-    mentee: "Emily Davies",
-  },
-];
+
+
+import { db } from "../data/db";
 
 export default function MentorDashboard() {
   const [activeNav, setActiveNav] = useState("View / Manage Projects");
@@ -30,34 +22,37 @@ export default function MentorDashboard() {
   const [tasks, setTasks] = useState([]);
   const [mobileOpen, setMobileOpen] = useState(false);
 
+  const currentUser = JSON.parse(localStorage.getItem("mentorFlow_currentUser")) || {
+    id: "2",
+    name: "Sarah Connor",
+    role: "MENTOR"
+  };
+
   useEffect(() => {
-    const storedProjects =
-      JSON.parse(localStorage.getItem("mentorFlow_projects")) || [];
-    setProjects(storedProjects.filter((p) => p.mentor === "Sarah Connor"));
+    setProjects(db.projects.getAll().filter((p) => p.mentor && p.mentor.id === currentUser.id));
+    setTasks(db.tasks.getForMentor(currentUser.id));
+  }, [currentUser.id]);
 
-    const storedTasks = JSON.parse(localStorage.getItem("mentorFlow_tasks"));
-    if (storedTasks) {
-      setTasks(storedTasks);
-    } else {
-      localStorage.setItem("mentorFlow_tasks", JSON.stringify(DEFAULT_TASKS));
-      setTasks(DEFAULT_TASKS);
-    }
-  }, []);
+  const handleCreateTask = ({ desc, deadline, priority, menteeId }) => {
+    const mentorProjects = db.projects.getAll().filter((p) => p.mentor && p.mentor.id === currentUser.id);
+    const projectId = mentorProjects.length > 0 ? mentorProjects[0].id : "1";
 
-  const handleCreateTask = ({ desc, deadline, priority, mentee }) => {
-    const newTask = {
-      id: Date.now(),
+    db.tasks.create({
+      projectId,
+      createdById: currentUser.id,
+      assignedToId: menteeId,
       title: desc,
-      status: "To Do",
+      description: desc,
       priority,
-      deadline: deadline || "No Deadline",
-      assigner: "Sarah Connor",
-      mentee,
-    };
-    const updated = [...tasks, newTask];
-    setTasks(updated);
-    localStorage.setItem("mentorFlow_tasks", JSON.stringify(updated));
-    alert("Task created and assigned to " + mentee);
+      deadline: deadline || "Next week"
+    });
+
+    const menteeName = db.users.getById(menteeId)?.name || "Mentee";
+    alert("Task created and assigned to " + menteeName);
+
+    // Refresh state
+    setTasks(db.tasks.getForMentor(currentUser.id));
+    setProjects(db.projects.getAll().filter((p) => p.mentor && p.mentor.id === currentUser.id));
   };
 
   const renderSection = () => {

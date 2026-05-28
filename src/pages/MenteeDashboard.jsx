@@ -7,35 +7,35 @@ import MenteeDashboardOverview from "../components/mentee/MenteeDashboardOvervie
 import TaskManagement from "../components/mentee/TaskManagement";
 import TaskSubmitModal from "../components/mentee/TaskSubmitModal";
 import PlaceholderSection from "../components/admin/PlaceholderSection";
-import { tasks as defaultTasks } from "../data/menteeData";
+
+
+import { db } from "../data/db";
 
 export default function MenteeDashboard() {
   const [activeNav, setActiveNav] = useState("Dashboard");
-  const [menteeTasks, setMenteeTasks] = useState(defaultTasks);
+  const [menteeTasks, setMenteeTasks] = useState([]);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
   const [mobileOpen, setMobileOpen] = useState(false);
 
+  const currentUser = JSON.parse(localStorage.getItem("mentorFlow_currentUser")) || {
+    id: "1",
+    name: "Emily Davies",
+    role: "MENTEE"
+  };
+
   useEffect(() => {
-    const stored = JSON.parse(localStorage.getItem("mentorFlow_tasks"));
-    if (stored) {
-      const myTasks = stored.filter((t) => t.mentee === "Emily Davies");
-      if (myTasks.length > 0) setMenteeTasks(myTasks);
-    }
-  }, []);
+    setMenteeTasks(db.tasks.getForMentee(currentUser.id));
+  }, [currentUser.id]);
 
   const handleTaskClick = (task) => {
     setSelectedTask(task);
     setShowSubmitModal(true);
   };
 
-  const handleSubmit = () => {
-    const stored = JSON.parse(localStorage.getItem("mentorFlow_tasks")) || [];
-    const updated = stored.map((t) =>
-      t.id === selectedTask.id ? { ...t, status: "Under Review" } : t,
-    );
-    localStorage.setItem("mentorFlow_tasks", JSON.stringify(updated));
-    setMenteeTasks(updated.filter((t) => t.mentee === "Emily Davies"));
+  const handleSubmit = (notes) => {
+    db.tasks.submitWork(selectedTask.id, currentUser.id, notes);
+    setMenteeTasks(db.tasks.getForMentee(currentUser.id));
     setShowSubmitModal(false);
     alert("Task submitted for review!");
   };

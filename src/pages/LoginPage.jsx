@@ -90,6 +90,8 @@ import LoginLeftPanel from "../components/login/LoginLeftPanel";
 import LoginRightPanel from "../components/login/LoginRightPanel";
 import LoginSuccessScreen from "../components/login/LoginSuccessScreen";
 
+import { db } from "../data/db";
+
 export default function LoginPage({ onNavigate, onBack }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -105,17 +107,21 @@ export default function LoginPage({ onNavigate, onBack }) {
     setLoading(false);
     setEmail(demoAccount.email);
     setPassword(demoAccount.password);
+    
+    const dbUser = db.users.getByEmail(demoAccount.email) || demoAccount.user;
+    localStorage.setItem("mentorFlow_currentUser", JSON.stringify(dbUser));
+
     setDemoSuccess(
-      demoAccount.user.role === "MENTOR"
+      dbUser.role === "MENTOR"
         ? "mentor"
-        : demoAccount.user.role === "ADMIN"
+        : dbUser.role === "ADMIN"
           ? "admin"
           : "student",
     );
-    setLoggedInUser(demoAccount.user);
+    setLoggedInUser(dbUser);
     setTimeout(() => {
-      if (demoAccount.user.role === "ADMIN") navigate("/admin-dashboard");
-      else if (demoAccount.user.role === "MENTEE")
+      if (dbUser.role === "ADMIN") navigate("/admin-dashboard");
+      else if (dbUser.role === "MENTEE")
         navigate("/mentee-dashboard");
       else navigate("/mentor-dashboard");
     }, 300);
@@ -124,6 +130,27 @@ export default function LoginPage({ onNavigate, onBack }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     setError("");
+
+    // Try finding the user inside our relational database first!
+    const dbUser = db.users.getByEmail(email);
+    if (dbUser) {
+      localStorage.setItem("mentorFlow_currentUser", JSON.stringify(dbUser));
+      setDemoSuccess(
+        dbUser.role === "MENTOR"
+          ? "mentor"
+          : dbUser.role === "ADMIN"
+            ? "admin"
+            : "student",
+      );
+      setLoggedInUser(dbUser);
+      setTimeout(() => {
+        if (dbUser.role === "ADMIN") navigate("/admin-dashboard");
+        else if (dbUser.role === "MENTEE") navigate("/mentee-dashboard");
+        else navigate("/mentor-dashboard");
+      }, 300);
+      return;
+    }
+
     const matched = [mentorDemo, studentDemo, adminDemo].find(
       (a) => a.email === email && a.password === password,
     );

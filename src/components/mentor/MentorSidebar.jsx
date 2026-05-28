@@ -118,6 +118,13 @@ export default function MentorSidebar({
     setMobileOpen(false); // close drawer on mobile after selection
   };
 
+  const currentUser = JSON.parse(localStorage.getItem("mentorFlow_currentUser")) || {
+    name: "Sarah Connor",
+    role: "MENTOR",
+    avatar: "SC",
+    color: "#6366f1"
+  };
+
   return (
     <>
       {/* Mobile backdrop — tap to close */}
@@ -257,13 +264,13 @@ export default function MentorSidebar({
 
         {/* ── Bottom user ── */}
         <div className="mx-3 lg:mx-4 pt-3.5 border-t border-slate-100 flex items-center gap-3">
-          <Avatar initials="SC" color="#6366f1" size={36} />
+          <Avatar initials={currentUser.avatar} color={currentUser.color} size={36} />
           <div className="min-w-0">
             <div className="text-[13px] lg:text-sm font-bold text-slate-800 truncate">
-              Sarah Connor
+              {currentUser.name}
             </div>
             <div className="text-[11px] lg:text-xs text-slate-400">
-              Senior Mentor
+              {currentUser.role === "MENTOR" ? "Mentor" : "Admin"}
             </div>
           </div>
           <span className="ml-auto bg-green-100 text-green-700 px-2 py-0.5 rounded-full text-[10px] lg:text-xs font-bold shrink-0">
