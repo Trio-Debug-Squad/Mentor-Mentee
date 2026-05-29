@@ -1,227 +1,188 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Avatar from "../ui/Avatar";
 import ProgressBar from "../ui/ProgressBar";
 import StatusBadge from "../ui/StatusBadge";
-import MentorStatCard from "./MentorStatCard";
-import {
-  mentees,
-  mentorStatCards,
-  immediateActions,
-} from "../../data/mentorData";
+import StatCard from "../ui/StatCard";
+import { db } from "../../data/db";
 
-export default function MentorOverview({ projects }) {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [completedActions, setCompletedActions] = useState([]);
+const statusStyle = {
+  Active: "bg-green-100 text-green-700",
+  "On Hold": "bg-amber-100 text-amber-700",
+  Completed: "bg-blue-100 text-blue-700",
+  Archived: "bg-slate-100 text-slate-500",
+};
 
-  // Extract real assigned mentees from the projects prop!
-  const dbMentees = [];
+export default function MentorOverview({ projects, onNavigate }) {
+  const [tasksAwaitingReview, setTasksAwaitingReview] = useState([]);
+  const [completedTasksCount, setCompletedTasksCount] = useState(0);
+  const [allTasksCount, setAllTasksCount] = useState(0);
+  
+  const currentUser = JSON.parse(localStorage.getItem("mentorFlow_currentUser")) || {
+    id: "2",
+    name: "Sarah Connor",
+    role: "MENTOR"
+  };
+
+  useEffect(() => {
+    const list = db.tasks.getForMentor(currentUser.id);
+    setAllTasksCount(list.length);
+    setTasksAwaitingReview(list.filter(t => t.status === "SUBMITTED"));
+    setCompletedTasksCount(list.filter(t => t.status === "APPROVED").length);
+  }, [currentUser.id]);
+
+  // Extract real active assigned mentees count
   const addedMenteeIds = new Set();
-
   projects.forEach((p) => {
     if (p.mentees) {
       p.mentees.forEach((m) => {
-        if (!addedMenteeIds.has(m.id)) {
-          addedMenteeIds.add(m.id);
-          dbMentees.push({
-            id: m.id,
-            name: m.name,
-            project: p.name,
-            lastMeeting: "No meetings logged",
-            progress: p.progress,
-            status: p.progress === 100 ? "Completed" : "On Track",
-            avatar: m.avatar || m.name.substring(0, 2).toUpperCase(),
-            color: m.color || "#6366f1",
-          });
-        }
+        addedMenteeIds.add(m.id);
       });
     }
   });
-
-  // Fall back to static mentees only if no active database assignments are found
-  const activeMenteesList = dbMentees.length > 0 ? dbMentees : mentees;
-
-  const filteredMentees = activeMenteesList.filter(
-    (m) =>
-      m.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      m.project.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
-
-  const toggleAction = (id) =>
-    setCompletedActions((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
-    );
+  const activeMenteesCount = addedMenteeIds.size;
 
   return (
-    <div>
-      {/* ── Stat cards ── */}
-      <div className="grid grid-cols-2 lg:flex gap-3 md:gap-4 lg:gap-5 mb-5 md:mb-6 lg:mb-7 pl-0 md:pl-4 lg:pl-8">
-        {mentorStatCards.map((s) => (
-          <MentorStatCard key={s.label} {...s} />
-        ))}
+    <div className="flex flex-col gap-6 animate-fade-in pl-0 md:pl-4 lg:pl-8">
+      {/* Dynamic Advisor Stats Cards */}
+      <div className="flex gap-4 flex-wrap">
+        <StatCard
+          icon="👥"
+          label="Active Mentees"
+          value={activeMenteesCount.toString()}
+          badge="Workspace Team"
+          badgeColor="blue"
+        />
+        <StatCard
+          icon="📁"
+          label="My Projects"
+          value={projects.length.toString()}
+          badge="Advisor Tracks"
+          badgeColor="green"
+        />
+        <StatCard
+          icon="⏳"
+          label="Awaiting Review"
+          value={tasksAwaitingReview.length.toString()}
+          badge="Action Required"
+          badgeColor="blue"
+        />
+        <StatCard
+          icon="✓"
+          label="Milestones Cleared"
+          value={`${allTasksCount > 0 ? Math.round((completedTasksCount / allTasksCount) * 100) : 0}%`}
+          badge="Overall progress"
+          badgeColor="green"
+        />
       </div>
 
-      {/* ── Assigned projects ── */}
-      <div
-        className="bg-white rounded-2xl p-4 md:p-5 lg:p-7 border border-slate-100 ml-0 md:ml-4 lg:ml-8 mb-4 md:mb-5 lg:mb-7"
-        style={{ boxShadow: "0 2px 16px rgba(99,102,241,0.07)" }}
-      >
-        <h2 className="m-0 mb-3 md:mb-4 text-sm md:text-base lg:text-lg font-black text-slate-800">
-          My Assigned Projects (Assigned by Admin)
-        </h2>
-        {projects.length === 0 ? (
-          <p className="text-slate-500 text-xs md:text-sm">
-            No projects assigned yet.
-          </p>
-        ) : (
-          <div className="flex gap-3 md:gap-4 flex-wrap">
-            {projects.map((p) => (
-              <div
-                key={p.id}
-                className="p-3 md:p-4 border border-slate-200 rounded-xl min-w-40 md:min-w-48"
-              >
-                <div className="text-xs md:text-sm font-bold text-slate-800 mb-1 md:mb-1.5">
-                  {p.name}
-                </div>
-                <div className="text-xs text-slate-500 flex items-center gap-1.5">
-                  Status: <StatusBadge status={p.status} />
-                </div>
+      {/* Main Grid Section */}
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 items-start">
+        {/* Left 2 Columns: Assigned Projects Summary */}
+        <div className="xl:col-span-2 flex flex-col gap-6">
+          <div className="bg-white rounded-3xl border border-slate-100 p-6 flex flex-col gap-4" style={{ boxShadow: "0 2px 16px rgba(99,102,241,0.04)" }}>
+            <div>
+              <h2 className="m-0 text-sm md:text-base font-black text-slate-800">
+                Supervised Projects in Progress
+              </h2>
+              <p className="m-0 mt-0.5 text-slate-400 text-[11px] font-semibold">List of academic track workspaces assigned by admin.</p>
+            </div>
+
+            {projects.length === 0 ? (
+              <div className="py-6 text-center text-slate-400 text-xs font-semibold bg-slate-50/50 rounded-2xl border border-slate-100">
+                No active projects assigned yet.
               </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* ── Mentees table + actions ── */}
-      <div className="flex flex-col lg:flex-row gap-4 md:gap-5 items-start ml-0 md:ml-4 lg:ml-8">
-        {/* Table */}
-        <div
-          className="w-full lg:flex-1 bg-white rounded-2xl border border-slate-100 overflow-hidden"
-          style={{ boxShadow: "0 2px 16px rgba(99,102,241,0.07)" }}
-        >
-          <div className="px-4 md:px-5 lg:px-7 pt-4 md:pt-5 lg:pt-6 pb-3 md:pb-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
-            <h2 className="m-0 text-sm md:text-base lg:text-lg font-black text-slate-800">
-              Current Mentees Overview
-            </h2>
-            <input
-              placeholder="Search mentees…"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="px-3 py-1.5 md:px-3.5 md:py-2 rounded-xl border border-slate-200 outline-none text-xs text-slate-600 bg-slate-50 w-full sm:w-36 md:w-44"
-              style={{ fontFamily: "inherit" }}
-            />
-          </div>
-
-          {/* Scrollable on mobile */}
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse min-w-130">
-              <thead>
-                <tr className="bg-slate-50">
-                  {[
-                    "#",
-                    "Mentee Name",
-                    "Assigned Project",
-                    "Last Meeting",
-                    "Progress",
-                    "Status",
-                  ].map((h) => (
-                    <th
-                      key={h}
-                      className="px-3 md:px-4 py-2.5 md:py-3 text-left text-xs font-bold text-slate-400 tracking-wide border-b border-slate-100"
-                    >
-                      {h}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {filteredMentees.map((m, i) => (
-                  <tr
-                    key={m.id}
-                    className="border-b border-slate-50 cursor-pointer transition-colors hover:bg-indigo-50/30"
+            ) : (
+              <div className="flex flex-col gap-3">
+                {projects.map((p) => (
+                  <div
+                    key={p.id}
+                    className="p-4 bg-slate-50/50 border border-slate-200 rounded-2xl flex justify-between items-center flex-wrap gap-3 hover:bg-slate-50 transition-colors"
                   >
-                    <td className="px-3 md:px-4 py-3 md:py-3.5 text-xs text-slate-400 font-semibold">
-                      {i + 1}.
-                    </td>
-                    <td className="px-3 md:px-4 py-3 md:py-3.5">
-                      <div className="flex items-center gap-2 md:gap-2.5">
-                        <Avatar initials={m.avatar} color={m.color} size={28} />
-                        <span className="font-semibold text-slate-800 text-xs md:text-sm">
-                          {m.name}
-                        </span>
+                    <div className="min-w-0">
+                      <span className="block font-black text-slate-800 text-xs md:text-sm truncate">{p.name}</span>
+                      <span className="block text-[11px] text-slate-400 font-semibold mt-0.5 uppercase">Mentor Lead: Sarah Connor</span>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <div className="w-28 sm:w-36">
+                        <div className="flex justify-between text-[9px] text-slate-400 font-bold mb-1">
+                          <span>PROGRESS</span>
+                          <span>{p.progress}%</span>
+                        </div>
+                        <ProgressBar value={p.progress} />
                       </div>
-                    </td>
-                    <td className="px-3 md:px-4 py-3 md:py-3.5 text-xs text-slate-500">
-                      {m.project}
-                    </td>
-                    <td className="px-3 md:px-4 py-3 md:py-3.5 text-xs text-slate-500">
-                      {m.lastMeeting}
-                    </td>
-                    <td className="px-3 md:px-4 py-3 md:py-3.5">
-                      <ProgressBar value={m.progress} />
-                    </td>
-                    <td className="px-3 md:px-4 py-3 md:py-3.5">
-                      <StatusBadge status={m.status} />
-                    </td>
-                  </tr>
+                      <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold border uppercase tracking-wider ${statusStyle[p.status] || statusStyle.Active}`}>
+                        {p.status}
+                      </span>
+                    </div>
+                  </div>
                 ))}
-              </tbody>
-            </table>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* ── Immediate actions ── */}
-        <div
-          className="w-full lg:w-64 bg-white rounded-2xl border border-slate-100 p-4 md:p-5 lg:p-6 lg:shrink-0"
-          style={{ boxShadow: "0 2px 16px rgba(99,102,241,0.07)" }}
-        >
-          <h2 className="m-0 mb-3 md:mb-4 text-sm font-black text-slate-800">
-            Immediate Actions
-          </h2>
-          <div className="flex flex-col gap-2.5 md:gap-3">
-            {immediateActions.map((action) => {
-              const done = completedActions.includes(action.id);
-              return (
-                <div
-                  key={action.id}
-                  onClick={() => toggleAction(action.id)}
-                  className="rounded-xl p-3 md:p-3.5 cursor-pointer transition-all duration-200"
-                  style={{
-                    background: done ? "#f0fdf4" : "#f8fafc",
-                    border: `1px solid ${done ? "#86efac" : "#f1f5f9"}`,
-                  }}
-                >
-                  <div className="flex gap-2 md:gap-2.5 items-start">
-                    <span className="text-base md:text-lg">{action.icon}</span>
-                    <span
-                      className="text-xs font-semibold leading-snug"
-                      style={{
-                        color: done ? "#16a34a" : "#334155",
-                        textDecoration: done ? "line-through" : "none",
-                      }}
-                    >
-                      {action.text}
-                    </span>
-                  </div>
-                  {done && (
-                    <div className="text-xs text-green-600 mt-1.5 ml-6 md:ml-7 font-semibold">
-                      ✓ Done
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+        {/* Right 1 Column: Quick Action Shortcuts & Awaiting Review */}
+        <div className="flex flex-col gap-6">
+          {/* Quick Action Shortcuts */}
+          <div className="bg-white rounded-3xl border border-slate-100 p-6 flex flex-col gap-4" style={{ boxShadow: "0 2px 16px rgba(99,102,241,0.04)" }}>
+            <div>
+              <h2 className="m-0 text-sm md:text-base font-black text-slate-800">
+                Quick Action Shortcuts
+              </h2>
+              <p className="m-0 mt-0.5 text-slate-400 text-[11px] font-semibold">Shortcuts to manage deliverables and teams.</p>
+            </div>
+            <div className="flex flex-col gap-2">
+              <button
+                onClick={() => onNavigate("Tasks")}
+                className="w-full text-left bg-indigo-50 hover:bg-indigo-100 text-indigo-600 font-bold border-none px-4 py-3 rounded-xl text-xs cursor-pointer transition-colors flex items-center gap-2"
+                style={{ fontFamily: "inherit" }}
+              >
+                📝 Launch deliverables checklist
+              </button>
+              <button
+                onClick={() => onNavigate("Reviews")}
+                className="w-full text-left bg-indigo-50 hover:bg-indigo-100 text-indigo-600 font-bold border-none px-4 py-3 rounded-xl text-xs cursor-pointer transition-colors flex items-center gap-2"
+                style={{ fontFamily: "inherit" }}
+              >
+                ⏳ Open submitted grading queue
+              </button>
+              <button
+                onClick={() => onNavigate("Team")}
+                className="w-full text-left bg-indigo-50 hover:bg-indigo-100 text-indigo-600 font-bold border-none px-4 py-3 rounded-xl text-xs cursor-pointer transition-colors flex items-center gap-2"
+                style={{ fontFamily: "inherit" }}
+              >
+                👥 Search mentees workspace info
+              </button>
+            </div>
           </div>
 
-          <div
-            className="mt-4 md:mt-5 p-3 md:p-3.5 rounded-2xl"
-            style={{ background: "linear-gradient(135deg, #ede9fe, #dbeafe)" }}
-          >
-            <div className="text-xs font-bold text-indigo-500 mb-1">
-              💡 Quick Tip
+          {/* Tasks Awaiting Review Queue */}
+          <div className="bg-white rounded-3xl border border-slate-100 p-6 flex flex-col gap-4" style={{ boxShadow: "0 2px 16px rgba(99,102,241,0.04)" }}>
+            <div>
+              <h2 className="m-0 text-sm md:text-base font-black text-slate-800">
+                Awaiting Grading Review ({tasksAwaitingReview.length})
+              </h2>
+              <p className="m-0 mt-0.5 text-slate-400 text-[11px] font-semibold">Tasks awaiting constructive comments.</p>
             </div>
-            <div className="text-xs text-slate-500 leading-relaxed">
-              David Chen's project is at 90% — a review now keeps momentum
-              strong!
+
+            <div className="flex flex-col gap-2.5 max-h-[220px] overflow-y-auto pr-1">
+              {tasksAwaitingReview.length === 0 ? (
+                <div className="text-center py-4 text-slate-400 text-xs font-semibold">All submissions successfully graded.</div>
+              ) : (
+                tasksAwaitingReview.map(t => (
+                  <div
+                    key={t.id}
+                    onClick={() => onNavigate("Reviews")}
+                    className="p-3 bg-slate-50/50 border border-slate-100 rounded-xl hover:bg-indigo-50/10 cursor-pointer transition-colors flex justify-between items-center"
+                  >
+                    <div className="min-w-0">
+                      <span className="block font-bold text-slate-700 text-xs truncate max-w-[130px]">{t.title}</span>
+                      <span className="block text-[10px] text-slate-400 font-bold uppercase">{t.assigneeName}</span>
+                    </div>
+                    <span className="text-[9px] font-extrabold text-amber-500 bg-amber-50 px-2 py-0.5 rounded border border-amber-100 uppercase shrink-0">Under Review</span>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>

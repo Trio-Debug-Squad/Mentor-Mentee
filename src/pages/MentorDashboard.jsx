@@ -4,22 +4,20 @@ import MentorSidebar, {
 } from "../components/mentor/MentorSidebar";
 import MentorHeader from "../components/mentor/MentorHeader";
 import MentorOverview from "../components/mentor/MentorOverview";
-import CreateTasksSection from "../components/mentor/CreateTasksSection";
-import ReviewActions from "../components/mentor/ReviewActions";
+import MentorProjects from "../components/mentor/MentorProjects";
+import MentorTasks from "../components/mentor/MentorTasks";
+import MentorTeam from "../components/mentor/MentorTeam";
+import MentorReviews from "../components/mentor/MentorReviews";
+import MentorActivity from "../components/mentor/MentorActivity";
+import MentorProfile from "../components/mentor/MentorProfile";
 import NewUserModal from "../components/mentor/NewUserModal";
 import PlaceholderSection from "../components/admin/PlaceholderSection";
-import { overviewNavItems } from "../data/mentorData";
-
-
-
 import { db } from "../data/db";
 
 export default function MentorDashboard() {
-  const [activeNav, setActiveNav] = useState("View / Manage Projects");
-  const [expandedMenu, setExpandedMenu] = useState("Projects");
+  const [activeNav, setActiveNav] = useState("Dashboard");
   const [showNewUserModal, setShowNewUserModal] = useState(false);
   const [projects, setProjects] = useState([]);
-  const [tasks, setTasks] = useState([]);
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const currentUser = JSON.parse(localStorage.getItem("mentorFlow_currentUser")) || {
@@ -28,50 +26,37 @@ export default function MentorDashboard() {
     role: "MENTOR"
   };
 
-  useEffect(() => {
-    setProjects(db.projects.getAll().filter((p) => p.mentor && p.mentor.id === currentUser.id));
-    setTasks(db.tasks.getForMentor(currentUser.id));
-  }, [currentUser.id]);
-
-  const handleCreateTask = ({ desc, deadline, priority, menteeId }) => {
-    const mentorProjects = db.projects.getAll().filter((p) => p.mentor && p.mentor.id === currentUser.id);
-    const projectId = mentorProjects.length > 0 ? mentorProjects[0].id : "1";
-
-    db.tasks.create({
-      projectId,
-      createdById: currentUser.id,
-      assignedToId: menteeId,
-      title: desc,
-      description: desc,
-      priority,
-      deadline: deadline || "Next week"
-    });
-
-    const menteeName = db.users.getById(menteeId)?.name || "Mentee";
-    alert("Task created and assigned to " + menteeName);
-
-    // Refresh state
-    setTasks(db.tasks.getForMentor(currentUser.id));
+  const refreshDashboardData = () => {
     setProjects(db.projects.getAll().filter((p) => p.mentor && p.mentor.id === currentUser.id));
   };
 
+  useEffect(() => {
+    refreshDashboardData();
+  }, [currentUser.id]);
+
+  const handleActiveNavChange = (name) => {
+    setActiveNav(name);
+    refreshDashboardData();
+  };
+
   const renderSection = () => {
-    if (overviewNavItems.includes(activeNav)) {
-      return <MentorOverview projects={projects} />;
-    }
     switch (activeNav) {
-      case "Create Tasks":
-        return (
-          <CreateTasksSection tasks={tasks} onCreateTask={handleCreateTask} />
-        );
-      case "Actions":
-        return <ReviewActions />;
+      case "Dashboard":
+        return <MentorOverview projects={projects} onNavigate={handleActiveNavChange} />;
+      case "My Projects":
+        return <MentorProjects />;
+      case "Tasks":
+        return <MentorTasks />;
+      case "Team":
+        return <MentorTeam />;
+      case "Reviews":
+        return <MentorReviews />;
+      case "Activity":
+        return <MentorActivity />;
+      case "Profile":
+        return <MentorProfile />;
       default:
-        return (
-          <div className="md:ml-4 lg:ml-8">
-            <PlaceholderSection title={activeNav} />
-          </div>
-        );
+        return <PlaceholderSection title={activeNav} />;
     }
   };
 
@@ -79,9 +64,7 @@ export default function MentorDashboard() {
     <div className="flex min-h-screen bg-slate-50 font-sans overflow-x-hidden w-full">
       <MentorSidebar
         activeNav={activeNav}
-        setActiveNav={setActiveNav}
-        expandedMenu={expandedMenu}
-        setExpandedMenu={setExpandedMenu}
+        setActiveNav={handleActiveNavChange}
         mobileOpen={mobileOpen}
         setMobileOpen={setMobileOpen}
       />
@@ -92,14 +75,15 @@ export default function MentorDashboard() {
         py-4 px-4 sm:py-6 sm:px-6 lg:py-8 lg:pr-8 lg:pl-0
         pt-16 md:pt-8"
       >
-        {/* Hamburger — mobile only, hides when sidebar open */}
         <MentorSidebarToggle
           onClick={() => setMobileOpen(true)}
           mobileOpen={mobileOpen}
         />
 
         <MentorHeader onNewUser={() => setShowNewUserModal(true)} />
-        {renderSection()}
+        <div className="mt-6 md:mt-4 animate-fade-in">
+          {renderSection()}
+        </div>
       </main>
 
       {showNewUserModal && (
