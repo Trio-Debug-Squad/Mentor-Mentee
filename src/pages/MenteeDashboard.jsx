@@ -4,18 +4,16 @@ import MenteeSidebar, {
 } from "../components/mentee/MenteeSidebar";
 import MenteeHeader from "../components/mentee/MenteeHeader";
 import MenteeDashboardOverview from "../components/mentee/MenteeDashboardOverview";
-import TaskManagement from "../components/mentee/TaskManagement";
-import TaskSubmitModal from "../components/mentee/TaskSubmitModal";
-import PlaceholderSection from "../components/admin/PlaceholderSection";
-
-
+import MenteeTasks from "../components/mentee/MenteeTasks";
+import MenteeProjects from "../components/mentee/MenteeProjects";
+import MenteeFeedback from "../components/mentee/MenteeFeedback";
+import MenteeActivity from "../components/mentee/MenteeActivity";
+import MenteeProfile from "../components/mentee/MenteeProfile";
 import { db } from "../data/db";
 
 export default function MenteeDashboard() {
   const [activeNav, setActiveNav] = useState("Dashboard");
   const [menteeTasks, setMenteeTasks] = useState([]);
-  const [showSubmitModal, setShowSubmitModal] = useState(false);
-  const [selectedTask, setSelectedTask] = useState(null);
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const currentUser = JSON.parse(localStorage.getItem("mentorFlow_currentUser")) || {
@@ -24,20 +22,17 @@ export default function MenteeDashboard() {
     role: "MENTEE"
   };
 
-  useEffect(() => {
+  const refreshMenteeData = () => {
     setMenteeTasks(db.tasks.getForMentee(currentUser.id));
-  }, [currentUser.id]);
-
-  const handleTaskClick = (task) => {
-    setSelectedTask(task);
-    setShowSubmitModal(true);
   };
 
-  const handleSubmit = (notes) => {
-    db.tasks.submitWork(selectedTask.id, currentUser.id, notes);
-    setMenteeTasks(db.tasks.getForMentee(currentUser.id));
-    setShowSubmitModal(false);
-    alert("Task submitted for review!");
+  useEffect(() => {
+    refreshMenteeData();
+  }, [currentUser.id]);
+
+  const handleActiveNavChange = (name) => {
+    setActiveNav(name);
+    refreshMenteeData();
   };
 
   const renderSection = () => {
@@ -46,16 +41,27 @@ export default function MenteeDashboard() {
         return (
           <MenteeDashboardOverview
             tasks={menteeTasks}
-            onNavigate={setActiveNav}
-            onTaskClick={handleTaskClick}
+            onNavigate={handleActiveNavChange}
+            onTaskClick={() => handleActiveNavChange("My Tasks")}
           />
         );
-      case "Task Management":
-        return (
-          <TaskManagement tasks={menteeTasks} onTaskClick={handleTaskClick} />
-        );
+      case "My Tasks":
+        return <MenteeTasks />;
+      case "My Projects":
+        return <MenteeProjects />;
+      case "Feedback":
+        return <MenteeFeedback />;
+      case "Activity":
+        return <MenteeActivity />;
+      case "Profile":
+        return <MenteeProfile />;
       default:
-        return <PlaceholderSection title={activeNav} />;
+        return (
+          <div className="bg-white rounded-2xl p-8 text-center border border-slate-100 text-slate-400">
+            <h2 className="m-0 text-slate-700">{activeNav}</h2>
+            <p className="m-0 text-xs">Section is loading...</p>
+          </div>
+        );
     }
   };
 
@@ -63,7 +69,7 @@ export default function MenteeDashboard() {
     <div className="flex min-h-screen bg-slate-50 font-sans overflow-x-hidden w-full">
       <MenteeSidebar
         activeNav={activeNav}
-        setActiveNav={setActiveNav}
+        setActiveNav={handleActiveNavChange}
         mobileOpen={mobileOpen}
         setMobileOpen={setMobileOpen}
       />
@@ -74,7 +80,6 @@ export default function MenteeDashboard() {
         p-4 sm:p-6 lg:p-8
         pt-16 md:pt-8"
       >
-        {/* Hamburger — mobile only, hides when sidebar open */}
         <MenteeSidebarToggle
           onClick={() => setMobileOpen(true)}
           mobileOpen={mobileOpen}
@@ -82,18 +87,13 @@ export default function MenteeDashboard() {
 
         <MenteeHeader
           activeNav={activeNav}
-          onMessageMentor={() => setActiveNav("Messages & Meetings")}
+          onMessageMentor={() => handleActiveNavChange("Feedback")}
         />
-        {renderSection()}
+        
+        <div className="mt-6 md:mt-4">
+          {renderSection()}
+        </div>
       </main>
-
-      {showSubmitModal && (
-        <TaskSubmitModal
-          task={selectedTask}
-          onClose={() => setShowSubmitModal(false)}
-          onSubmit={handleSubmit}
-        />
-      )}
     </div>
   );
 }

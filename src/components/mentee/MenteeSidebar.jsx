@@ -1,46 +1,5 @@
-import { useState } from "react";
 import Avatar from "../ui/Avatar";
-import { menteeMenuData } from "../../data/menteeData";
 
-function MenuIcon({ iconKey }) {
-  if (iconKey === "folder")
-    return (
-      <svg
-        width="18"
-        height="18"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-      >
-        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
-      </svg>
-    );
-  if (iconKey === "chart")
-    return (
-      <svg
-        width="18"
-        height="18"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-      >
-        <line x1="18" y1="20" x2="18" y2="10" />
-        <line x1="12" y1="20" x2="12" y2="4" />
-        <line x1="6" y1="20" x2="6" y2="14" />
-      </svg>
-    );
-  return null;
-}
-
-const activeStyle = {
-  background: "linear-gradient(135deg, #6366f1, #818cf8)",
-  color: "#fff",
-  boxShadow: "0 4px 14px rgba(99,102,241,0.25)",
-};
-
-// Hamburger toggle — mobile only, hidden when sidebar open
 export function MenteeSidebarToggle({ onClick, mobileOpen }) {
   if (mobileOpen) return null;
   return (
@@ -71,6 +30,11 @@ export default function MenteeSidebar({
   mobileOpen,
   setMobileOpen,
 }) {
+  const handleNavClick = (item) => {
+    setActiveNav(item);
+    setMobileOpen(false); // close drawer on mobile after selection
+  };
+
   const currentUser = JSON.parse(localStorage.getItem("mentorFlow_currentUser")) || {
     name: "Emily Davies",
     role: "MENTEE",
@@ -78,16 +42,68 @@ export default function MenteeSidebar({
     color: "#f472b6"
   };
 
-  const [expandedMenu, setExpandedMenu] = useState(null);
-
-  const handleNavClick = (item) => {
-    setActiveNav(item);
-    setMobileOpen(false);
-  };
+  const menuItems = [
+    {
+      name: "Dashboard",
+      icon: (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="3" y="3" width="7" height="9" />
+          <rect x="14" y="3" width="7" height="5" />
+          <rect x="14" y="12" width="7" height="9" />
+          <rect x="3" y="16" width="7" height="5" />
+        </svg>
+      )
+    },
+    {
+      name: "My Tasks",
+      icon: (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+          <polyline points="14 2 14 8 20 8" />
+          <line x1="16" y1="13" x2="8" y2="13" />
+          <line x1="16" y1="17" x2="8" y2="17" />
+        </svg>
+      )
+    },
+    {
+      name: "My Projects",
+      icon: (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+        </svg>
+      )
+    },
+    {
+      name: "Feedback",
+      icon: (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+        </svg>
+      )
+    },
+    {
+      name: "Activity",
+      icon: (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="10" />
+          <polyline points="12 6 12 12 16 14" />
+        </svg>
+      )
+    },
+    {
+      name: "Profile",
+      icon: (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+          <circle cx="12" cy="7" r="4" />
+        </svg>
+      )
+    }
+  ];
 
   return (
     <>
-      {/* Mobile backdrop */}
+      {/* Mobile backdrop — tap to close */}
       {mobileOpen && (
         <div
           className="md:hidden fixed inset-0 bg-black/30 z-90 backdrop-blur-sm"
@@ -137,133 +153,46 @@ export default function MenteeSidebar({
 
         {/* Nav */}
         <div className="px-3 md:px-3 lg:px-4 flex-1 overflow-y-auto">
-          <div className="text-[11px] font-bold text-slate-400 tracking-[1.2px] mb-2 pl-2">
-            MENU
+          <div className="text-[11px] font-bold text-slate-400 tracking-[1.2px] mb-4 pl-2 uppercase">
+            MY STUDY DESK
           </div>
 
-          {/* Dashboard */}
-          <div className="mb-1">
-            <button
-              onClick={() => {
-                handleNavClick("Dashboard");
-                setExpandedMenu(null);
-              }}
-              className="flex items-center gap-3 w-full px-3 md:px-2.5 lg:px-3.5 py-2.5 md:py-2.25 lg:py-2.75 border-none rounded-xl cursor-pointer text-[13px] md:text-[12px] lg:text-sm font-bold transition-all duration-200"
-              style={
-                activeNav === "Dashboard"
-                  ? { ...activeStyle, fontFamily: "inherit" }
-                  : {
-                      background: "transparent",
-                      color: "#64748b",
-                      fontFamily: "inherit",
-                    }
-              }
-            >
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <rect x="3" y="3" width="7" height="7" />
-                <rect x="14" y="3" width="7" height="7" />
-                <rect x="14" y="14" width="7" height="7" />
-                <rect x="3" y="14" width="7" height="7" />
-              </svg>
-              Dashboard
-            </button>
+          <div className="flex flex-col gap-1.5">
+            {menuItems.map(({ name, icon }) => {
+              const active = activeNav === name;
+              return (
+                <button
+                  key={name}
+                  onClick={() => handleNavClick(name)}
+                  className="flex items-center gap-3 w-full px-3.5 py-3 border-none rounded-xl cursor-pointer text-[13px] md:text-[12px] lg:text-sm font-bold transition-all duration-200"
+                  style={{
+                    background: active
+                      ? "linear-gradient(135deg, #6366f1, #818cf8)"
+                      : "transparent",
+                    color: active ? "#fff" : "#64748b",
+                    boxShadow: active
+                      ? "0 4px 14px rgba(99,102,241,0.2)"
+                      : "none",
+                    fontFamily: "inherit",
+                  }}
+                >
+                  {icon}
+                  {name}
+                </button>
+              );
+            })}
           </div>
-
-          {/* Grouped menus */}
-          {menteeMenuData.map(({ category, iconKey, items }) => (
-            <div key={category} className="mb-1">
-              <button
-                onClick={() =>
-                  setExpandedMenu(expandedMenu === category ? null : category)
-                }
-                className="flex items-center justify-between w-full px-3 md:px-2.5 lg:px-3.5 py-2.5 md:py-2.25 lg:py-2.75 border-none rounded-xl cursor-pointer text-[13px] md:text-[12px] lg:text-sm font-bold transition-all duration-200"
-                style={{
-                  background:
-                    expandedMenu === category ? "#eef2ff" : "transparent",
-                  fontFamily: "inherit",
-                }}
-              >
-                <div
-                  className="flex items-center gap-3"
-                  style={{
-                    color: expandedMenu === category ? "#6366f1" : "#64748b",
-                  }}
-                >
-                  <MenuIcon iconKey={iconKey} />
-                  <span
-                    style={{
-                      color: expandedMenu === category ? "#6366f1" : "#475569",
-                    }}
-                  >
-                    {category}
-                  </span>
-                </div>
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke={expandedMenu === category ? "#6366f1" : "#94a3b8"}
-                  strokeWidth="2"
-                  style={{
-                    transform:
-                      expandedMenu === category
-                        ? "rotate(180deg)"
-                        : "rotate(0deg)",
-                    transition: "transform 0.2s",
-                  }}
-                >
-                  <polyline points="6 9 12 15 18 9" />
-                </svg>
-              </button>
-
-              {expandedMenu === category && (
-                <div className="pl-7 flex flex-col gap-1 py-1">
-                  {items.map((item) => (
-                    <button
-                      key={item}
-                      onClick={() => handleNavClick(item)}
-                      className="text-left px-3 py-2 rounded-lg border-none cursor-pointer text-[12px] md:text-[11px] lg:text-xs transition-all duration-200"
-                      style={
-                        activeNav === item
-                          ? {
-                              ...activeStyle,
-                              fontWeight: 700,
-                              fontFamily: "inherit",
-                            }
-                          : {
-                              background: "transparent",
-                              color: "#64748b",
-                              fontWeight: 500,
-                              fontFamily: "inherit",
-                            }
-                      }
-                    >
-                      {item}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
         </div>
 
         {/* Bottom user */}
-        <div className="mx-3 lg:mx-4 pt-3.5 border-t border-slate-100 flex items-center gap-3">
+        <div className="mx-3 lg:mx-4 pt-3.5 pb-4 border-t border-slate-100 flex items-center gap-3">
           <Avatar initials={currentUser.avatar} color={currentUser.color} size={36} />
           <div className="min-w-0">
             <div className="text-[13px] lg:text-sm font-bold text-slate-800 truncate">
               {currentUser.name}
             </div>
             <div className="text-[11px] lg:text-xs text-slate-400">
-              {currentUser.role === "MENTEE" ? "Mentee" : "Mentor"}
+              Student Track
             </div>
           </div>
         </div>

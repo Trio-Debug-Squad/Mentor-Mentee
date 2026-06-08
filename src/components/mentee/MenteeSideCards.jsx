@@ -1,98 +1,154 @@
-import { recentFeedback, notificationsList } from "../../data/menteeData";
+import { useState, useEffect } from "react";
+import { db } from "../../data/db";
 
 export function RecentFeedbackCard() {
+  const [feedbacks, setFeedbacks] = useState([]);
+
+  const currentUser = JSON.parse(localStorage.getItem("mentorFlow_currentUser")) || {
+    id: "1",
+    name: "Emily Davies",
+    role: "MENTEE"
+  };
+
+  useEffect(() => {
+    const list = db.tasks.getForMentee(currentUser.id);
+    const allFeedbacks = [];
+    list.forEach(t => {
+      if (t.feedbacks) {
+        t.feedbacks.forEach(f => {
+          allFeedbacks.push({
+            id: f.id,
+            task: t.title,
+            mentor: "Sarah Connor",
+            text: f.comment,
+            date: f.createdAt
+          });
+        });
+      }
+    });
+    setFeedbacks(allFeedbacks.slice(0, 3));
+  }, [currentUser.id]);
+
   return (
     <div
-      className="bg-white rounded-2xl p-4 md:p-5 lg:p-7 border border-slate-100"
-      style={{ boxShadow: "0 2px 16px rgba(0,0,0,0.02)" }}
+      className="bg-white rounded-2xl p-5 border border-slate-100 flex flex-col gap-4 animate-fade-in"
+      style={{ boxShadow: "0 2px 16px rgba(99,102,241,0.03)" }}
     >
-      <h2 className="m-0 mb-4 md:mb-5 text-base md:text-lg lg:text-xl font-black text-slate-800">
-        Recent Feedback
+      <h2 className="m-0 text-sm md:text-base font-black text-slate-800">
+        Recent Advisor Feedback
       </h2>
 
-      <div className="flex flex-col gap-3 md:gap-4">
-        {recentFeedback.map((fb) => (
-          <div
-            key={fb.id}
-            className="p-3 md:p-4 bg-slate-50 rounded-xl md:rounded-2xl border border-slate-100"
-          >
-            {/* Task + Date */}
-            <div className="flex justify-between mb-1.5 md:mb-2">
-              <span className="text-[11px] md:text-xs lg:text-sm font-bold text-indigo-500">
-                {fb.task}
-              </span>
-              <span className="text-[11px] md:text-xs text-slate-400 font-semibold">
-                {fb.date}
-              </span>
-            </div>
-
-            {/* Feedback text */}
-            <p className="m-0 text-[11px] md:text-xs lg:text-sm text-slate-600 leading-relaxed mb-2 md:mb-2.5">
-              "{fb.text}"
-            </p>
-
-            {/* Mentor */}
-            <div className="text-[11px] md:text-xs lg:text-sm text-slate-500 font-medium">
-              — {fb.mentor}
-            </div>
+      <div className="flex flex-col gap-3">
+        {feedbacks.length === 0 ? (
+          <div className="text-center py-6 text-slate-400 text-xs font-semibold bg-slate-50/50 rounded-xl border border-slate-100">
+            No advisor comments logged yet.
           </div>
-        ))}
+        ) : (
+          feedbacks.map((fb) => (
+            <div
+              key={fb.id}
+              className="p-3 bg-slate-50 border border-slate-100 rounded-xl flex flex-col gap-1.5"
+            >
+              <div className="flex justify-between mb-1">
+                <span className="text-[11px] font-extrabold text-indigo-500 truncate max-w-[130px]">
+                  {fb.task}
+                </span>
+                <span className="text-[10px] text-slate-400 font-bold">
+                  {fb.date}
+                </span>
+              </div>
+              <p className="m-0 text-[11px] md:text-xs text-slate-600 leading-relaxed italic">
+                "{fb.text}"
+              </p>
+              <span className="text-[10px] text-slate-400 font-bold self-end mt-1">
+                — {fb.mentor}
+              </span>
+            </div>
+          ))
+        )}
       </div>
     </div>
   );
 }
 
 export function NotificationsCard() {
-  const unreadCount = notificationsList.filter((n) => n.unread).length;
+  const [notifications, setNotifications] = useState([]);
+
+  const currentUser = JSON.parse(localStorage.getItem("mentorFlow_currentUser")) || {
+    id: "1",
+    name: "Emily Davies",
+    role: "MENTEE"
+  };
+
+  const refreshNotifs = () => {
+    const list = db.notifications.getForUser(currentUser.id);
+    setNotifications(list.slice(0, 5));
+  };
+
+  useEffect(() => {
+    refreshNotifs();
+  }, [currentUser.id]);
+
+  const handleMarkAllRead = () => {
+    db.notifications.markAllRead(currentUser.id);
+    refreshNotifs();
+  };
+
+  const unreadCount = notifications.filter((n) => !n.isRead).length;
 
   return (
     <div
-      className="bg-white rounded-2xl p-4 md:p-5 lg:p-7 border border-slate-100"
-      style={{ boxShadow: "0 2px 16px rgba(0,0,0,0.02)" }}
+      className="bg-white rounded-2xl p-5 border border-slate-100 flex flex-col gap-4 animate-fade-in"
+      style={{ boxShadow: "0 2px 16px rgba(99,102,241,0.03)" }}
     >
-      {/* Header */}
-      <div className="flex justify-between items-center mb-4 md:mb-5">
-        <h2 className="m-0 text-base md:text-lg lg:text-xl font-black text-slate-800">
-          Notifications
+      <div className="flex justify-between items-center">
+        <h2 className="m-0 text-sm md:text-base font-black text-slate-800 font-sans">
+          Notifications Feed
         </h2>
-        {unreadCount > 0 && (
-          <span className="bg-red-50 text-red-500 px-2 py-0.5 rounded-full text-[10px] md:text-xs lg:text-sm font-black">
-            {unreadCount} New
-          </span>
+        {unreadCount > 0 ? (
+          <button
+            onClick={handleMarkAllRead}
+            className="bg-indigo-50 hover:bg-indigo-100 text-indigo-600 px-2.5 py-1 rounded-lg text-[9px] font-black border-none cursor-pointer transition-colors uppercase tracking-wider"
+          >
+            Mark Read
+          </button>
+        ) : (
+          <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">All Read</span>
         )}
       </div>
 
-      <div className="flex flex-col gap-2 md:gap-3">
-        {notificationsList.map((n) => (
-          <div
-            key={n.id}
-            className="flex gap-2.5 md:gap-3 py-2.5 md:py-3 border-b border-slate-50"
-          >
-            {/* Dot */}
+      <div className="flex flex-col gap-2">
+        {notifications.length === 0 ? (
+          <div className="text-center py-6 text-slate-400 text-xs font-semibold bg-slate-50/50 rounded-xl border border-slate-100">
+            No notifications inboxed.
+          </div>
+        ) : (
+          notifications.map((n) => (
             <div
-              className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full mt-1.5 shrink-0"
-              style={{ background: n.unread ? "#6366f1" : "#cbd5e1" }}
-            />
-
-            <div>
-              {/* Notification text */}
+              key={n.id}
+              className="flex gap-2.5 py-2.5 border-b border-slate-50 last:border-0"
+            >
               <div
-                className="text-[11px] md:text-xs lg:text-sm leading-snug mb-0.5 md:mb-1"
-                style={{
-                  color: n.unread ? "#1e293b" : "#64748b",
-                  fontWeight: n.unread ? 600 : 500,
-                }}
-              >
-                {n.text}
-              </div>
-
-              {/* Time */}
-              <div className="text-[10px] md:text-xs text-slate-400 font-medium">
-                {n.time}
+                className="w-1.5 h-1.5 rounded-full mt-1.5 shrink-0"
+                style={{ background: !n.isRead ? "#6366f1" : "#cbd5e1" }}
+              />
+              <div className="min-w-0">
+                <div
+                  className="text-xs leading-relaxed mb-0.5 truncate max-w-[200px]"
+                  style={{
+                    color: !n.isRead ? "#1e293b" : "#64748b",
+                    fontWeight: !n.isRead ? 700 : 500,
+                  }}
+                >
+                  {n.body}
+                </div>
+                <div className="text-[9px] text-slate-400 font-bold uppercase">
+                  {n.createdAt}
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
     </div>
   );

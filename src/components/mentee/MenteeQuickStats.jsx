@@ -1,27 +1,56 @@
-import { quickStats } from "../../data/menteeData";
+import { db } from "../../data/db";
 
 export default function MenteeQuickStats() {
+  const currentUser = JSON.parse(localStorage.getItem("mentorFlow_currentUser")) || {
+    id: "1",
+    name: "Emily Davies",
+    role: "MENTEE"
+  };
+
+  const tasks = db.tasks.getForMentee(currentUser.id);
+  const totalCount = tasks.length;
+  const completedCount = tasks.filter(t => t.status === "APPROVED").length;
+  const rejectedCount = tasks.filter(t => t.status === "REJECTED").length;
+  const progressPercent = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
+
+  const stats = [
+    {
+      label: "Overall Progress",
+      value: `${progressPercent}%`,
+      suffix: `Target Track`,
+      suffixColor: "#10b981",
+    },
+    {
+      label: "Tasks Completed",
+      value: completedCount.toString(),
+      suffix: `/ ${totalCount} assigned`,
+      suffixColor: "#64748b",
+    },
+    {
+      label: "Revision Requests",
+      value: rejectedCount.toString(),
+      suffix: `Needs changes`,
+      suffixColor: rejectedCount > 0 ? "#ef4444" : "#64748b",
+    },
+  ];
+
   return (
-    <div className="grid grid-cols-2 lg:flex gap-3 md:gap-4 lg:gap-5 mb-5 md:mb-6 lg:mb-7">
-      {quickStats.map((s) => (
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-7 animate-fade-in">
+      {stats.map((s) => (
         <div
           key={s.label}
-          className="bg-white
-            p-4 md:p-5 lg:p-6
-            rounded-xl md:rounded-2xl
-            border border-slate-100
-            lg:flex-1 lg:min-w-48"
-          style={{ boxShadow: "0 2px 16px rgba(0,0,0,0.02)" }}
+          className="bg-white p-5 rounded-2xl border border-slate-100 flex-1 min-w-40"
+          style={{ boxShadow: "0 2px 16px rgba(99,102,241,0.03)" }}
         >
-          <div className="text-[10px] md:text-[11px] lg:text-xs text-slate-500 font-semibold uppercase tracking-wide mb-1.5 md:mb-2">
+          <div className="text-[10px] md:text-[11px] lg:text-xs text-slate-400 font-bold uppercase tracking-wider mb-2">
             {s.label}
           </div>
-          <div className="flex items-baseline gap-1.5 md:gap-2">
-            <span className="text-[26px] md:text-[32px] lg:text-4xl font-black text-slate-800 leading-none">
+          <div className="flex items-baseline gap-2">
+            <span className="text-[26px] md:text-[32px] lg:text-3xl font-black text-slate-800 leading-none">
               {s.value}
             </span>
             <span
-              className="text-xs md:text-sm font-semibold"
+              className="text-xs font-bold"
               style={{ color: s.suffixColor }}
             >
               {s.suffix}

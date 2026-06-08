@@ -238,30 +238,12 @@ export default function ProjectsList({ onViewProject, onRefresh }) {
                   <tr key={p.id} className="border-b border-slate-50 hover:bg-slate-50/30 transition-colors">
                     <td className="px-6 py-4 font-black text-slate-800 text-xs md:text-sm lg:text-base">{p.name}</td>
                     <td className="px-6 py-4 text-xs text-slate-500 font-semibold">{p.mentorName || "Unassigned"}</td>
-                    {/* Overlapping Avatar stacks for mentees */}
-                    <td className="px-6 py-4">
+                    {/* Assigned or Unassigned for mentees */}
+                    <td className="px-6 py-4 text-xs text-slate-500 font-semibold">
                       {p.mentees && p.mentees.length > 0 ? (
-                        <div className="flex items-center">
-                          <div className="flex -space-x-2 overflow-hidden mr-2">
-                            {p.mentees.slice(0, 3).map((st) => (
-                              <div
-                                key={st.id}
-                                title={st.name}
-                                className="inline-block h-7 w-7 rounded-full ring-2 ring-white flex items-center justify-center text-[10px] font-black text-white cursor-help transition-transform hover:scale-110 hover:z-10"
-                                style={{ backgroundColor: st.color || "#6366f1" }}
-                              >
-                                {st.avatar}
-                              </div>
-                            ))}
-                          </div>
-                          {p.mentees.length > 3 && (
-                            <span className="text-[10px] font-black text-slate-400">
-                              +{p.mentees.length - 3} more
-                            </span>
-                          )}
-                        </div>
+                        <span>Assigned</span>
                       ) : (
-                        <span className="text-xs text-slate-400 italic font-medium">Unassigned</span>
+                        <span className="text-slate-400 italic font-medium">Unassigned</span>
                       )}
                     </td>
                     <td className="px-6 py-4"><StatusBadge status={p.status} /></td>

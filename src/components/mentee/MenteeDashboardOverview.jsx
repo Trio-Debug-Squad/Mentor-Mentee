@@ -9,24 +9,24 @@ export default function MenteeDashboardOverview({
   onTaskClick,
 }) {
   return (
-    <div>
+    <div className="flex flex-col gap-6 animate-fade-in">
       <MenteeQuickStats />
 
-      <div className="flex flex-col lg:flex-row gap-4 md:gap-5 lg:gap-6 items-start">
-        {/* Left column — stacks on mobile/tablet, side by side on desktop */}
-        <div className="flex flex-col gap-4 md:gap-5 lg:gap-6 w-full lg:flex-2">
+      <div className="flex flex-col lg:flex-row gap-5 items-start">
+        {/* Left column */}
+        <div className="flex flex-col gap-5 w-full lg:flex-2">
           <AssignedProjectsCard
-            onViewAll={() => onNavigate("Assigned Projects")}
+            onViewAll={() => onNavigate("My Projects")}
           />
           <MyTasksCard
             tasks={tasks}
-            onManageTasks={() => onNavigate("Task Management")}
+            onManageTasks={() => onNavigate("My Tasks")}
             onTaskClick={onTaskClick}
           />
         </div>
 
-        {/* Right column — stacks on mobile/tablet, side by side on desktop */}
-        <div className="flex flex-col gap-4 md:gap-5 lg:gap-6 w-full lg:flex-1">
+        {/* Right column */}
+        <div className="flex flex-col gap-5 w-full lg:flex-1 shrink-0">
           <RecentFeedbackCard />
           <NotificationsCard />
         </div>
